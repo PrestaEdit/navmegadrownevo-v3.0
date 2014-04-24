@@ -86,7 +86,7 @@ class NavMegaDrownEvo extends Module
 
 	public function getContent()
 	{
-		$warning = $this->l($this->displayName.' is in test for PrestaShop 1.6. If you need, contact me at: j.danse@prestaedit.com');
+		$warning = $this->displayName.$this->l(' is in test for PrestaShop 1.6. If you need, contact me at: ').' j.danse@prestaedit.com';
 		$this->adminDisplayWarning($warning);
 
 		global $ButtonIdInEdit;
