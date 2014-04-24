@@ -947,10 +947,12 @@ class NavMegaDrownEvo extends Module
 			$MDParameters = array();
 			$MDParameters = MegaDrownEvo::getParameters();
 
+			/*
 			$MDParameters[0]['bg_menu'] 			= $this->checkIfImageExist('bg_menu', $MDParameters[0]['extensionMenu']);
 			$MDParameters[0]['bg_bout'] 			= $this->checkIfImageExist('bg_bout', $MDParameters[0]['extensionBout']);;
 			$MDParameters[0]['navlist_arrow'] 		= $this->checkIfImageExist('navlist_arrow', $MDParameters[0]['extensionArro']);;
 			$MDParameters[0]['sub_bg'] 				= $this->checkIfImageExist('sub_bg', $MDParameters[0]['extensionBack']);
+			*/
 
 			$this->context->smarty->assign(array(
 				'MenuWidthEvo' => ($MDParameters[0]['MenuWidth'] - $MDParameters[0]['paddingLeft']),
