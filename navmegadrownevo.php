@@ -566,8 +566,7 @@ class NavMegaDrownEvo extends Module
 
 			// Lang Fields
 			foreach ($languages as $language)
-				// Force une valeur...
-				$helper->fields_value['button_name'][$language['id_lang']] = (isset($details->name_button[$language['id_lang']]) ? $details->name_button[$language['id_lang']] : '');
+				$helper->fields_value['button_name'] = $details->name_button;
 
 			$output .= $helper->generateForm($fields_form);
 		}
