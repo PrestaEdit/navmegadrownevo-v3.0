@@ -99,36 +99,13 @@ class NavMegaDrownEvo extends Module
 		{
 			$order_button = MegaDrownEvo::getMaxPosition() + 1;
 
-			$result = Db::getInstance()->insert('admevo_button',
-				array(
-					'order_button' => (int)$order_button
-				)
-			);
+			$button = new Button();
+			$button->order_button = (int)$order_button;
+			foreach ($languages as $language)
+				$button->name_button[(int)$language['id_lang']] = pSQL(Tools::getValue('button_name_'.(int)$language['id_lang']));
 
-			if(!$result)
+			if(!$button->add())
 				$errorsNb++;
-			else
-			{
-				$id_button = (int)Db::getInstance()->Insert_ID();
-
-				$languages = Language::getLanguages();
-				foreach ($languages as $language)
-				{
-					if (Tools::getValue('button_name_'.(int)$language['id_lang']) != '')
-					{
-						$result = Db::getInstance()->insert('admevo_button_lang',
-							array(
-							  'id_button' => (int)$id_button,
-							  'id_lang' => (int)$language['id_lang'],
-							  'name_button' => pSQL(Tools::getValue('button_name_'.(int)$language['id_lang']))
-							)
-						);
-
-						if(!$result)
-							$errorsNb++;
-					 }
-				}
-			}
 
 			if ($errorsNb)
 				$output .= $this->displayError($this->l('Unable to add this button'));
