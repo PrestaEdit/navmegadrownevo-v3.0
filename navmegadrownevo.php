@@ -5,8 +5,8 @@
  * @category   	Module / front_office_features
  * @author     	PrestaEdit <j.danse@prestaedit.com> (since 2.0)
  * @author     	DevForEver (special thanks to him)
- * @copyright  	2013 PrestaEdit
- * @version   	2.0
+ * @copyright  	2014 PrestaEdit
+ * @version   	3.0
  * @link       	http://www.prestaedit.com/
  * @since      	File available since Release 1.0
 */
