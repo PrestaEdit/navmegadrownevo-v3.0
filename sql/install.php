@@ -58,7 +58,7 @@
 	`detailSubTR` BLOB NULL ,
 	`detailSub` BLOB NULL ,
 	`detailSubLeft` BLOB NULL ,
-	INDEX ( `id_button` , `id_lang` )
+	PRIMARY KEY ( `id_button` , `id_lang` )
 	) ENGINE='._MYSQL_ENGINE_.' DEFAULT CHARSET=utf8';
 
 	$sql[] = 'CREATE TABLE IF NOT EXISTS `'._DB_PREFIX_.'admevo_button_langcat` (
@@ -66,7 +66,7 @@
 	`id_cat` INT NOT NULL ,
 	`id_lang` INT NOT NULL ,
 	`name_substitute` VARCHAR( 255 ) NOT NULL ,
-	INDEX (`id_button`, `id_cat` , `id_lang` )
+	PRIMARY KEY (`id_button`, `id_cat` , `id_lang` )
 	) ENGINE='._MYSQL_ENGINE_.' DEFAULT CHARSET=utf8';
 
 	$sql[] = 'CREATE TABLE IF NOT EXISTS `'._DB_PREFIX_.'admevo_button_link_cat` (

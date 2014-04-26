@@ -20,6 +20,7 @@ if (!defined('_MYSQL_ENGINE_'))
 	define('_MYSQL_ENGINE_', 'MyISAM');
 
 include(dirname(__FILE__).'/models/megadrownevo.php');
+include(dirname(__FILE__).'/models/button.php');
 
 class NavMegaDrownEvo extends Module
 {
@@ -217,7 +218,7 @@ class NavMegaDrownEvo extends Module
 			if(!$result)
 				$errorsNb++;
 
-			$detailSubProgress = MegaDrownEvo::getButtonDetail((int)$id_button);
+			$detailSubProgress = new Button((int)$id_button);
 			if(sizeof($detailSubProgress))
 			{
 				foreach($detailSubProgress as $kSub=>$ValSub)
@@ -552,7 +553,7 @@ class NavMegaDrownEvo extends Module
 		}
 		else if (Tools::getIsset('updatenavmegadrownevo'))
 		{
-			$button = MegaDrownEvo::getButtonDetail((int)Tools::getValue('id_button'));
+			$button = new Button((int)Tools::getValue('id_button'));
 
 			$fields_form = array();
 
@@ -584,11 +585,12 @@ class NavMegaDrownEvo extends Module
 
 			$fields_form[0]['form']['input'][] = Fields::addField($this->l('Name'), 'button_name', null, '', true);
 
-			$details = MegaDrownEvo::getButtonDetail((int)Tools::getValue('id_button'));
+			$details = new Button((int)Tools::getValue('id_button'));
 
 			// Lang Fields
 			foreach ($languages as $language)
-				$helper->fields_value['button_name'][$language['id_lang']] = $details['name_button'];
+				// Force une valeur...
+				$helper->fields_value['button_name'][$language['id_lang']] = (isset($details->name_button[$language['id_lang']]) ? $details->name_button[$language['id_lang']] : '');
 
 			$output .= $helper->generateForm($fields_form);
 		}
@@ -815,7 +817,7 @@ class NavMegaDrownEvo extends Module
 						$MaxLines <($ValCustom['num_ligne']*1) ? $MaxLines = $ValCustom['num_ligne'] : false;
 					}
 				}
-				if(array_key_exists( $kButton, $tabLines))
+				if(array_key_exists($kButton, $tabLines))
 				{
 					if(sizeof($tabLines[$kButton]))
 					{
@@ -874,8 +876,8 @@ class NavMegaDrownEvo extends Module
 													$Category = new Category(intval($ValMenu['id_link_cat']), intval($this->context->language->id));
 													$rewrited_url = $this->context->link->getCategoryLink($ValMenu['id_link_cat']);
 													$this->_menu .= '	<li class="stitle">
-																							<a href="'.$rewrited_url.'" style="text-align:left">'.(trim($NameSubstitute[0]['name_substitute']) != '' ? $NameSubstitute[0]['name_substitute'] : $NameCategory[0]['name']).'</a>
-																						</li>'.$this->eol;
+																			<a href="'.$rewrited_url.'" style="text-align:left">'.(trim($NameSubstitute[0]['name_substitute']) != '' ? $NameSubstitute[0]['name_substitute'] : $NameCategory[0]['name']).'</a>
+																		</li>'.$this->eol;
 
 													if($ValMenu['view_products'] != 'on')
 													{
@@ -892,9 +894,8 @@ class NavMegaDrownEvo extends Module
 																	$NameCategoryUnder = $this->getNameCategory($ValUnderCat['id_category'], $this->context->language->id, $ValButton['id_button']);
 																	$NameSubstitute = $this->getNameSubstitute($ValUnderCat['id_category'], $this->context->language->id, $ValButton['id_button']);
 																	$this->_menu .= '	<li>
-																											<a href="'.$rewrited_url.'" style="text-align:left">'.(trim($NameSubstitute[0]['name_substitute']) != '' ? $NameSubstitute[0]['name_substitute'] : $NameCategoryUnder[0]['name']).'
-																											</a>
-																										</li>'.$this->eol;
+																							<a href="'.$rewrited_url.'" style="text-align:left">'.(trim($NameSubstitute[0]['name_substitute']) != '' ? $NameSubstitute[0]['name_substitute'] : $NameCategoryUnder[0]['name']).'</a>
+																						</li>'.$this->eol;
 																}
 															}
 														}
@@ -999,14 +1000,13 @@ class NavMegaDrownEvo extends Module
 		Tools::enableCache();
 		if (!$this->isCached('views/templates/front/cssnavmegadrownevo.tpl', $this->getCacheId()))
 		{
-			$MDParameters = array();
 			$MDParameters = MegaDrownEvo::getParameters();
 
 			/*
 			$MDParameters['bg_menu'] 			= $this->checkIfImageExist('bg_menu', $MDParameters['extensionMenu']);
 			$MDParameters['bg_bout'] 			= $this->checkIfImageExist('bg_bout', $MDParameters['extensionBout']);;
 			$MDParameters['navlist_arrow'] 		= $this->checkIfImageExist('navlist_arrow', $MDParameters['extensionArro']);;
-			$MDParameters['sub_bg'] 				= $this->checkIfImageExist('sub_bg', $MDParameters['extensionBack']);
+			$MDParameters['sub_bg'] 			= $this->checkIfImageExist('sub_bg', $MDParameters['extensionBack']);
 			*/
 
 			$this->context->smarty->assign(array(

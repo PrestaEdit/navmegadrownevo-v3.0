@@ -22,19 +22,6 @@ class MegaDrownEvo
 		');
 	}
 
-	static public function getButtonDetail($id_button, $id_lang = null)
-	{
-		return Db::getInstance()->ExecuteS('
-			SELECT *
-			FROM '._DB_PREFIX_.'admevo_button tb
-			LEFT JOIN '._DB_PREFIX_.'admevo_button_lang tbl
-			ON (tb.id_button = tbl.id_button)
-			WHERE tb.id_button='.(int)$id_button
-			.($id_lang ? 'AND tbl.id_lang = '.(int)$id_lang : '').'
-			ORDER BY order_button ASC, name_button ASC
-		');
-	}
-
 	static public function getButtonLinksCat($id_button)
 	{
 		return Db::getInstance()->ExecuteS('
