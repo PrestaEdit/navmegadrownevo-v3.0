@@ -5,8 +5,8 @@ class MegaDrownEvo
 	public static function getParameters()
 	{
 		return Db::getInstance()->ExecuteS('
-		SELECT *
-		FROM '._DB_PREFIX_.'admevo_parameters LIMIT 1
+			SELECT *
+			FROM '._DB_PREFIX_.'admevo_parameters LIMIT 1
 		' );
 	}
 
@@ -18,37 +18,41 @@ class MegaDrownEvo
 			LEFT JOIN '._DB_PREFIX_.'admevo_button_lang tbl
 			ON (tb.id_button=tbl.id_button)
 			WHERE tbl.id_lang='.(int)$id_lang.'
-			ORDER BY order_button ASC, name_button ASC');
+			ORDER BY order_button ASC, name_button ASC
+		');
 	}
 
-	static public function getButtonDetail($id_button)
+	static public function getButtonDetail($id_button, $id_lang = null)
 	{
 		return Db::getInstance()->ExecuteS('
-		SELECT *
-		FROM '._DB_PREFIX_.'admevo_button tb LEFT JOIN '._DB_PREFIX_.'admevo_button_lang tbl
-		ON (tb.id_button=tbl.id_button)
-		WHERE tb.id_button='.(int)$id_button.' ORDER BY order_button ASC, name_button ASC
+			SELECT *
+			FROM '._DB_PREFIX_.'admevo_button tb
+			LEFT JOIN '._DB_PREFIX_.'admevo_button_lang tbl
+			ON (tb.id_button = tbl.id_button)
+			WHERE tb.id_button='.(int)$id_button
+			.($id_lang ? 'AND tbl.id_lang = '.(int)$id_lang : '').'
+			ORDER BY order_button ASC, name_button ASC
 		');
 	}
 
 	static public function getButtonLinksCat($id_button)
 	{
 		return Db::getInstance()->ExecuteS('
-		SELECT *
-		FROM '._DB_PREFIX_.'admevo_button_link_cat
-		WHERE id_button='.(int)$id_button.' ORDER BY num_ligne ASC, num_column ASC, id_link_cat ASC
+			SELECT *
+			FROM '._DB_PREFIX_.'admevo_button_link_cat
+			WHERE id_button='.(int)$id_button.' ORDER BY num_ligne ASC, num_column ASC, id_link_cat ASC
 		');
 	}
 
 	static public function getButtonLinksCustom($id_button, $id_lang)
 	{
 		return Db::getInstance()->ExecuteS('
-		SELECT *
-		FROM '._DB_PREFIX_.'admevo_custom_menu tb
-		INNER JOIN '._DB_PREFIX_.'admevo_custom_menu_lang tbl
-		ON (tb.id_button=tbl.id_button AND tb.id_custom=tbl.id_custom)
-		WHERE tb.id_button='.(int)$id_button.' AND tb.id_parent = 0 AND tbl.id_lang='.(int)$id_lang.'
-		ORDER BY tb.num_ligne ASC, tb.num_column ASC
+			SELECT *
+			FROM '._DB_PREFIX_.'admevo_custom_menu tb
+			INNER JOIN '._DB_PREFIX_.'admevo_custom_menu_lang tbl
+			ON (tb.id_button=tbl.id_button AND tb.id_custom=tbl.id_custom)
+			WHERE tb.id_button='.(int)$id_button.' AND tb.id_parent = 0 AND tbl.id_lang='.(int)$id_lang.'
+			ORDER BY tb.num_ligne ASC, tb.num_column ASC
 		');
 	}
 
@@ -144,5 +148,13 @@ class MegaDrownEvo
 		return Db::getInstance()->ExecuteS('
 		SELECT count(id_link_cat) as nbCols
 		FROM '._DB_PREFIX_.'admevo_button_link_cat WHERE id_button='.(int)$IdButton.' AND num_ligne='.(int)$Line);
+	}
+
+	public static function getMaxPosition()
+	{
+		return Db::getInstance()->getValue('
+			SELECT MAX(tb.`order_button`) as position
+			FROM '._DB_PREFIX_.'admevo_button tb
+		');
 	}
 }

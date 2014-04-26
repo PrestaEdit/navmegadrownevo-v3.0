@@ -89,7 +89,6 @@ class NavMegaDrownEvo extends Module
 		$warning = $this->displayName.$this->l(' is in test for PrestaShop 1.6. If you need, contact me at: ').' j.danse@prestaedit.com';
 		$this->adminDisplayWarning($warning);
 
-		global $ButtonIdInEdit;
 		$defaultLanguage = intval(Configuration::get('PS_LANG_DEFAULT'));
 		$languages = Language::getLanguages();
 		$iso = Language::getIsoById($defaultLanguage);
@@ -101,29 +100,31 @@ class NavMegaDrownEvo extends Module
 
 		if (Tools::isSubmit('submitAddButton'))
 		{
-			$result = Db::getInstance()->autoExecute(
-				_DB_PREFIX_.'admevo_button', array('order_button' => 99), 'INSERT'
+			$order_button = MegaDrownEvo::getMaxPosition() + 1;
+
+			$result = Db::getInstance()->insert('admevo_button',
+				array(
+					'order_button' => (int)$order_button
+				)
 			);
 
 			if(!$result)
 				$errorsNb++;
 			else
 			{
-				$id_button = Db::getInstance()->Insert_ID();
+				$id_button = (int)Db::getInstance()->Insert_ID();
 
 				$languages = Language::getLanguages();
 				foreach ($languages as $language)
 				{
 					if (Tools::getValue('button_name_'.(int)$language['id_lang']) != '')
 					{
-						$result = Db::getInstance()->autoExecute(
-							_DB_PREFIX_.'admevo_button_lang',
+						$result = Db::getInstance()->insert('admevo_button_lang',
 							array(
 							  'id_button' => (int)$id_button,
 							  'id_lang' => (int)$language['id_lang'],
-							  'name_button' => addslashes(Tools::getValue('button_name_'.(int)$language['id_lang']))
-							),
-							'INSERT'
+							  'name_button' => pSQL(Tools::getValue('button_name_'.(int)$language['id_lang']))
+							)
 						);
 
 						if(!$result)
@@ -132,7 +133,7 @@ class NavMegaDrownEvo extends Module
 				}
 			}
 
-			if ($errorsNb!=0)
+			if ($errorsNb)
 				$output .= $this->displayError($this->l('Unable to add this button'));
 			else
 				$output .= $this->displayConfirmation($this->l('Button added'));
@@ -141,110 +142,122 @@ class NavMegaDrownEvo extends Module
 		}
 		else if(Tools::isSubmit('SubmitButtonParameters'))
 		{
-			$result = Db::getInstance()->autoExecute(
-				_DB_PREFIX_.'admevo_button',
+			$id_button = (int)Tools::getValue('ButttonIdToUpdate');
+
+			$result = Db::getInstance()->update('admevo_button',
 				array(
-					"buttonColor"=>(Tools::getValue('noColorButton')=="on" ? "" : Tools::getValue('buttonColor'))
+					"buttonColor" => (Tools::getValue('noColorButton') == "on" ? "" : Tools::getValue('buttonColor'))
 				),
-				"UPDATE", "id_button=".Tools::getValue('ButttonIdToUpdate'));
+				'id_button='.(int)$id_button
+			);
 
-			Db::getInstance()->delete(_DB_PREFIX_.'admevo_button_link_cat', "id_button = ".Tools::getValue('ButttonIdToUpdate'));
-			Db::getInstance()->delete(_DB_PREFIX_.'admevo_button_organization', "id_button = ".Tools::getValue('ButttonIdToUpdate'));
-			Db::getInstance()->delete(_DB_PREFIX_.'admevo_button_langcat', "id_button = ".Tools::getValue('ButttonIdToUpdate'));
-				if(is_array(Tools::getValue('categoryBox'))) {
-					foreach(Tools::getValue('categoryBox') as $id_cat=>$cat) {
-					  $numLigneCat = Tools::getValue('lineBox_'.$cat);
-					  $numColumnCat = Tools::getValue('columnBox_'.$cat);
-					  $result = Db::getInstance()->autoExecute(
-						_DB_PREFIX_.'admevo_button_link_cat',
+			Db::getInstance()->delete('admevo_button_link_cat', "id_button = ".$id_button);
+			Db::getInstance()->delete('admevo_button_organization', "id_button = ".$id_button);
+			Db::getInstance()->delete('admevo_button_langcat', "id_button = ".$id_button);
+
+			if(is_array(Tools::getValue('categoryBox')))
+			{
+				foreach(Tools::getValue('categoryBox') as $id_cat => $cat)
+				{
+					$numLigneCat = Tools::getValue('lineBox_'.$cat);
+					$numColumnCat = Tools::getValue('columnBox_'.$cat);
+
+					$result = Db::getInstance()->insert('admevo_button_link_cat',
 						array(
-						  'id_button'=>Tools::getValue('ButttonIdToUpdate'),
-						  'id_link_cat'=>$cat,
-						  'num_ligne'=>$numLigneCat,
-						  'num_column'=>$numColumnCat,
-						  'view_products'=>Tools::getValue('viewProducts_'.$cat)
-						),
-
-						'INSERT'
-					  );
+							'id_button' => $id_button,
+							'id_link_cat' => $cat,
+							'num_ligne' => $numLigneCat,
+							'num_column' => $numColumnCat,
+							'view_products' => Tools::getValue('viewProducts_'.$cat)
+						)
+					);
 				}
-				 foreach($_POST as $kPost=>$vPost) {
-					if(substr($kPost, 0 , 7)=="lineBox") {
+
+				foreach($_POST as $kPost=>$vPost)  // TODO: change this !
+				{
+					if(substr($kPost, 0 , 7)=="lineBox")
+					{
 						$tabDatas = explode('_', $kPost);
 						$idCat = $tabDatas[1];
-						$result = Db::getInstance()->autoExecute(
-							_DB_PREFIX_.'admevo_button_organization',
+						$result = Db::getInstance()->insert('admevo_button_organization',
 							array(
-							  'id_button' => Tools::getValue('ButttonIdToUpdate'),
+							  'id_button' => $id_button,
 							  'id_link_cat' => $idCat,
 							  'state' => Tools::getValue('State_'.$idCat),
 							  'num_ligne' => $vPost
-							),
-							'INSERT'
-						  );
-						foreach ($languages as $language) {
-							if(Tools::getValue('textSubstitute_'.$idCat."_".$language['id_lang']) != '') {
-								$result = Db::getInstance()->autoExecute(
-									_DB_PREFIX_.'admevo_button_langcat',
+							)
+						);
+
+						foreach ($languages as $language)
+						{
+							if(Tools::getValue('textSubstitute_'.$idCat."_".$language['id_lang']) != '')
+							{
+								$result = Db::getInstance()->insert('admevo_button_langcat',
 									array(
-									  'id_button' => Tools::getValue('ButttonIdToUpdate'),
+									  'id_button' => $id_button,
 									  'id_cat' => $idCat,
 									  'id_lang' => $language['id_lang'],
 									  'name_substitute' => addslashes(Tools::getValue('textSubstitute_'.$idCat."_".$language['id_lang']))
-									),
-									'INSERT'
-								  );
+									)
+								);
 							}
 						}
 					}
 				 }
-			  if(!$result) $errorsNb++;
+
+			  if(!$result)
+			  	$errorsNb++;
 			}
-			Db::getInstance()->delete(_DB_PREFIX_.'admevo_button_link', "id_button = ".Tools::getValue('ButttonIdToUpdate'));
-			$result = Db::getInstance()->autoExecute(
-				_DB_PREFIX_.'admevo_button_link',
+
+			Db::getInstance()->delete('admevo_button_link', "id_button = ".(int)$id_button);
+
+			$result = Db::getInstance()->insert('admevo_button_link',
 				array(
-				  'id_button'=>Tools::getValue('ButttonIdToUpdate'),
-				  'link'=>Tools::getValue('LinkPage')
-				),
-				'INSERT'
+				  'id_button' => (int)$id_button,
+				  'link' => Tools::getValue('LinkPage')
+				)
 			);
-			if(!$result) $errorsNb++;
-			$languages = Language::getLanguages();
-			$detailSubProgress = MegaDrownEvo::getButtonDetail(Tools::getValue('ButttonIdToUpdate'));
-			if(sizeof($detailSubProgress)) {
-				foreach($detailSubProgress as $kSub=>$ValSub) {
+
+			if(!$result)
+				$errorsNb++;
+
+			$detailSubProgress = MegaDrownEvo::getButtonDetail((int)$id_button);
+			if(sizeof($detailSubProgress))
+			{
+				foreach($detailSubProgress as $kSub=>$ValSub)
+				{
 					$infoSub[$ValSub['id_lang']]['detailSub'] = html_entity_decode($ValSub['detailSub']);
 					$infoSub[$ValSub['id_lang']]['detailSubLeft'] = html_entity_decode($ValSub['detailSubLeft']);
 					$infoSub[$ValSub['id_lang']]['detailSubTR'] = html_entity_decode($ValSub['detailSubTR']);
 				}
 			}
-			Db::getInstance()->delete(_DB_PREFIX_.'admevo_button_lang', "id_button = ".Tools::getValue('ButttonIdToUpdate'));
-			foreach ($languages as $language) {
+
+			Db::getInstance()->delete('admevo_button_lang', "id_button = ".(int)$id_button);
+			foreach ($languages as $language)
+			{
 				//if(Tools::getValue('ButtonNameEdit_'.$language['id_lang']) != '') {
-				if(1) {
-					$result = Db::getInstance()->autoExecute(
-						_DB_PREFIX_.'admevo_button_lang',
+				if(1)
+				{
+					$result = Db::getInstance()->insert('admevo_button_lang',
 						array(
-						  'id_button'=>Tools::getValue('ButttonIdToUpdate'),
-						  'id_lang'=>$language['id_lang'],
+						  'id_button' => (int)$id_button,
+						  'id_lang' => $language['id_lang'],
 						  'name_button'=>addslashes(Tools::getValue('ButtonNameEdit_'.$language['id_lang'])),
 						  'detailSub'=>htmlentities(addslashes((isset($infoSub[$language['id_lang']]['detailSub']) ? $infoSub[$language['id_lang']]['detailSub'] : ''))),
 						  'detailSubLeft'=>htmlentities(addslashes((isset($infoSub[$language['id_lang']]['detailSubLeft']) ? $infoSub[$language['id_lang']]['detailSubLeft'] : ''))),
 						  'detailSubTR'=>htmlentities(addslashes((isset($infoSub[$language['id_lang']]['detailSubTR']) ? $infoSub[$language['id_lang']]['detailSubTR'] : '')))
-						),
-						'INSERT'
+						)
 					);
-					if(!$result) $errorsNb++;
+
+					if(!$result)
+						$errorsNb++;
 				 }
 			}
-			if(!$result) $errorsNb++;
 
-			if($errorsNb!=0)
+			if($errorsNb)
 				$output .= $this->displayError($this->l('Unable to update this button'));
 			else
 				$output .= $this->displayConfirmation($this->l('Button updated'));
-			$ButtonIdInEdit = Tools::getValue('ButttonIdToUpdate');
 		}
 		else if(Tools::isSubmit('submitConfigure'))
 		{
@@ -296,54 +309,58 @@ class NavMegaDrownEvo extends Module
 		{
 			$id_button = (int)Tools::getValue('id_button');
 
-			Db::getInstance()->delete(_DB_PREFIX_.'admevo_button', "id_button = ".$id_button);
-			Db::getInstance()->delete(_DB_PREFIX_.'admevo_button_lang', "id_button = ".$id_button);
-			Db::getInstance()->delete(_DB_PREFIX_.'admevo_button_link', "id_button = ".$id_button);
-			Db::getInstance()->delete(_DB_PREFIX_.'admevo_button_link_cat', "id_button = ".$id_button);
-			Db::getInstance()->delete(_DB_PREFIX_.'admevo_custom_menu', "id_button = ".$id_button);
-			Db::getInstance()->delete(_DB_PREFIX_.'admevo_custom_menu_lang', "id_button = ".$id_button);
+			Db::getInstance()->delete('admevo_button', 'id_button = '.(int)$id_button);
+			Db::getInstance()->delete('admevo_button_lang', 'id_button = '.(int)$id_button);
+			Db::getInstance()->delete('admevo_button_link', 'id_button = '.(int)$id_button);
+			Db::getInstance()->delete('admevo_button_link_cat', 'id_button = '.(int)$id_button);
+			Db::getInstance()->delete('admevo_custom_menu', 'id_button = '.(int)$id_button);
+			Db::getInstance()->delete('admevo_custom_menu_lang', 'id_button = '.(int)$id_button);
 
 			Tools::redirectAdmin('index.php?controller=AdminModules&configure='.$this->name.'&tab_module=&module_name='.$this->name.'&token='.Tools::getValue('token'));
 		}
 		else if(Tools::isSubmit('SubmitDetailSub'))
 		{
-			foreach ($languages as $language) {
-				$result = Db::getInstance()->autoExecute(
-					_DB_PREFIX_.'admevo_button_lang',
+			$id_button = Tools::getValue('id_button');
+
+			foreach ($languages as $language)
+			{
+				$result = Db::getInstance()->update('admevo_button_lang',
 					array(
 					  'detailSub'=>htmlentities(addslashes(Tools::getValue('detailSub_'.$language['id_lang'])))
 					),
-					'UPDATE',
-					'id_button='.Tools::getValue('idButton').' AND
-					id_lang='.$language['id_lang']
+					'id_button='.(int)$id_button.' AND id_lang='.$language['id_lang']
 				);
-				if(!$result) $errorsNb++;
+
+				if(!$result)
+					$errorsNb++;
 			}
-			$ButtonIdInEdit = $_POST['idButton'];
 		}
 		else if(Tools::isSubmit('SubmitDetailSubTr'))
 		{
-			foreach ($languages as $language) {
-				$result = Db::getInstance()->autoExecute(
-					_DB_PREFIX_.'admevo_button_lang',
+			$id_button = Tools::getValue('id_button');
+
+			foreach ($languages as $language)
+			{
+				$result = Db::getInstance()->update('admevo_button_lang',
 					array(
 					  'detailSubTR'=>htmlentities(addslashes(Tools::getValue('detailSubTr_'.$language['id_lang'])))
 					),
-					'UPDATE',
-					'id_button='.Tools::getValue('idButton').' AND
-					id_lang='.$language['id_lang']
+					'id_button='.(int)$id_button.' AND id_lang='.$language['id_lang']
 				);
-				if(!$result) $errorsNb++;
+
+				if(!$result)
+					$errorsNb++;
 			}
-			$ButtonIdInEdit = Tools::getValue('idButton');
 		}
+		else
+			$output .= $this->displayForm();
 
 		$this->_clearCache('cssnavmegadrownevo.tpl', $this->getCacheId());
 
-		return $output.$this->newDisplayForm();
+		return $output;
 	}
 
-	public function newDisplayForm()
+	public function displayForm()
 	{
 		include(dirname(__FILE__).'/models/fields.php');
 
@@ -530,10 +547,52 @@ class NavMegaDrownEvo extends Module
 				'input' => array()
 			);
 
-			$fields_form[0]['form']['input'][] = Fields::addField($this->l('Add button'), 'button_name', null, '', true);
+			$fields_form[0]['form']['input'][] = Fields::addField($this->l('Name'), 'button_name', null, '', true);
 
 			foreach ($languages as $language)
 				$helper->fields_value['button_name'][$language['id_lang']] = '';
+
+			$output .= $helper->generateForm($fields_form);
+		}
+		else if (Tools::getIsset('updatenavmegadrownevo'))
+		{
+			$button = MegaDrownEvo::getButtonDetail((int)Tools::getValue('id_button'));
+
+			$fields_form = array();
+
+			$languages = Language::getLanguages(false);
+			foreach ($languages as $k => $language)
+				$languages[$k]['is_default'] = (int)($language['id_lang'] == Configuration::get('PS_LANG_DEFAULT'));
+
+			$helper = new HelperForm();
+			$helper->module = $this;
+			$helper->name_controller = $this->name;
+			$helper->identifier = $this->identifier;
+			$helper->token = Tools::getAdminTokenLite('AdminModules');
+			$helper->languages = $languages;
+			$helper->currentIndex = AdminController::$currentIndex.'&configure='.$this->name;
+			$helper->default_form_language = (int)Configuration::get('PS_LANG_DEFAULT');
+			$helper->allow_employee_form_lang = true;
+			$helper->toolbar_scroll = true;
+			$helper->title = $this->displayName;
+			$helper->submit_action = 'submitAddButton';
+
+			$fields_form[0]['form'] = array(
+				'tinymce' => true,
+				'submit' => array(
+					'name' => $helper->submit_action,
+					'title' => $this->l('Save')
+				),
+				'input' => array()
+			);
+
+			$fields_form[0]['form']['input'][] = Fields::addField($this->l('Name'), 'button_name', null, '', true);
+
+			$details = MegaDrownEvo::getButtonDetail((int)Tools::getValue('id_button'));
+
+			// Lang Fields
+			foreach ($languages as $language)
+				$helper->fields_value['button_name'][$language['id_lang']] = $details['name_button'];
 
 			$output .= $helper->generateForm($fields_form);
 		}
