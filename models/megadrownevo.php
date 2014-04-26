@@ -4,10 +4,10 @@ class MegaDrownEvo
 {
 	public static function getParameters()
 	{
-		return Db::getInstance()->ExecuteS('
+		return Db::getInstance()->getRow('
 			SELECT *
-			FROM '._DB_PREFIX_.'admevo_parameters LIMIT 1
-		' );
+			FROM '._DB_PREFIX_.'admevo_parameters
+		');
 	}
 
 	public static function getConfigurations($id_lang)
