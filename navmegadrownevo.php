@@ -47,9 +47,6 @@ class NavMegaDrownEvo extends Module
 		$this->description = $this->l('Add a MeGa DrOwN mEnU Evolution.');
 		$this->confirmUninstall = $this->l('Are you sure you want to delete this module ?');
 		$this->allow = intval(Configuration::get('PS_REWRITING_SETTINGS'));
-
-		if(!$this->isRegisteredInHook('displayBackOfficeHeader'))
-			$this->registerHook('displayBackOfficeHeader');
 	}
 
 	public function install()
@@ -63,8 +60,7 @@ class NavMegaDrownEvo extends Module
 		// Install Module
    		return 	parent::install()
 				&& $this->registerHook('displayTop')
-				&& $this->registerHook('displayHeader')
-				&& $this->registerHook('displayBackOfficeHeader');
+				&& $this->registerHook('displayHeader');
 	}
 
 	public function uninstall()
