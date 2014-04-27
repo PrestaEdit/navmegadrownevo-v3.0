@@ -101,8 +101,7 @@ class NavMegaDrownEvo extends Module
 
 			$button = new Button();
 			$button->order_button = (int)$order_button;
-			foreach ($languages as $language)
-				$button->name_button[(int)$language['id_lang']] = pSQL(Tools::getValue('button_name_'.(int)$language['id_lang']));
+			$button = $this->processSubmitButton($button);
 
 			if(!$button->add())
 				$errorsNb++;
@@ -114,124 +113,20 @@ class NavMegaDrownEvo extends Module
 
 			Tools::redirectAdmin('index.php?controller=AdminModules&configure='.$this->name.'&tab_module=&module_name='.$this->name.'&token='.Tools::getValue('token'));
 		}
-		else if(Tools::isSubmit('SubmitButtonParameters'))
+		else if (Tools::isSubmit('submitUpdateButton'))
 		{
-			$id_button = (int)Tools::getValue('ButttonIdToUpdate');
+			$button = new Button((int)Tools::getValue('id_button'));
+			$button = $this->processSubmitButton($button);
 
-			$result = Db::getInstance()->update('admevo_button',
-				array(
-					"buttonColor" => (Tools::getValue('noColorButton') == "on" ? "" : Tools::getValue('buttonColor'))
-				),
-				'id_button='.(int)$id_button
-			);
-
-			Db::getInstance()->delete('admevo_button_link_cat', "id_button = ".$id_button);
-			Db::getInstance()->delete('admevo_button_organization', "id_button = ".$id_button);
-			Db::getInstance()->delete('admevo_button_langcat', "id_button = ".$id_button);
-
-			if(is_array(Tools::getValue('categoryBox')))
-			{
-				foreach(Tools::getValue('categoryBox') as $id_cat => $cat)
-				{
-					$numLigneCat = Tools::getValue('lineBox_'.$cat);
-					$numColumnCat = Tools::getValue('columnBox_'.$cat);
-
-					$result = Db::getInstance()->insert('admevo_button_link_cat',
-						array(
-							'id_button' => $id_button,
-							'id_link_cat' => $cat,
-							'num_ligne' => $numLigneCat,
-							'num_column' => $numColumnCat,
-							'view_products' => Tools::getValue('viewProducts_'.$cat)
-						)
-					);
-				}
-
-				foreach($_POST as $kPost=>$vPost)  // TODO: change this !
-				{
-					if(substr($kPost, 0 , 7)=="lineBox")
-					{
-						$tabDatas = explode('_', $kPost);
-						$idCat = $tabDatas[1];
-						$result = Db::getInstance()->insert('admevo_button_organization',
-							array(
-							  'id_button' => $id_button,
-							  'id_link_cat' => $idCat,
-							  'state' => Tools::getValue('State_'.$idCat),
-							  'num_ligne' => $vPost
-							)
-						);
-
-						foreach ($languages as $language)
-						{
-							if(Tools::getValue('textSubstitute_'.$idCat."_".$language['id_lang']) != '')
-							{
-								$result = Db::getInstance()->insert('admevo_button_langcat',
-									array(
-									  'id_button' => $id_button,
-									  'id_cat' => $idCat,
-									  'id_lang' => $language['id_lang'],
-									  'name_substitute' => addslashes(Tools::getValue('textSubstitute_'.$idCat."_".$language['id_lang']))
-									)
-								);
-							}
-						}
-					}
-				 }
-
-			  if(!$result)
-			  	$errorsNb++;
-			}
-
-			Db::getInstance()->delete('admevo_button_link', "id_button = ".(int)$id_button);
-
-			$result = Db::getInstance()->insert('admevo_button_link',
-				array(
-				  'id_button' => (int)$id_button,
-				  'link' => Tools::getValue('LinkPage')
-				)
-			);
-
-			if(!$result)
+			if(!$button->update())
 				$errorsNb++;
 
-			$detailSubProgress = new Button((int)$id_button);
-			if(sizeof($detailSubProgress))
-			{
-				foreach($detailSubProgress as $kSub=>$ValSub)
-				{
-					$infoSub[$ValSub['id_lang']]['detailSub'] = html_entity_decode($ValSub['detailSub']);
-					$infoSub[$ValSub['id_lang']]['detailSubLeft'] = html_entity_decode($ValSub['detailSubLeft']);
-					$infoSub[$ValSub['id_lang']]['detailSubTR'] = html_entity_decode($ValSub['detailSubTR']);
-				}
-			}
-
-			Db::getInstance()->delete('admevo_button_lang', "id_button = ".(int)$id_button);
-			foreach ($languages as $language)
-			{
-				//if(Tools::getValue('ButtonNameEdit_'.$language['id_lang']) != '') {
-				if(1)
-				{
-					$result = Db::getInstance()->insert('admevo_button_lang',
-						array(
-						  'id_button' => (int)$id_button,
-						  'id_lang' => $language['id_lang'],
-						  'name_button'=>addslashes(Tools::getValue('ButtonNameEdit_'.$language['id_lang'])),
-						  'detailSub'=>htmlentities(addslashes((isset($infoSub[$language['id_lang']]['detailSub']) ? $infoSub[$language['id_lang']]['detailSub'] : ''))),
-						  'detailSubLeft'=>htmlentities(addslashes((isset($infoSub[$language['id_lang']]['detailSubLeft']) ? $infoSub[$language['id_lang']]['detailSubLeft'] : ''))),
-						  'detailSubTR'=>htmlentities(addslashes((isset($infoSub[$language['id_lang']]['detailSubTR']) ? $infoSub[$language['id_lang']]['detailSubTR'] : '')))
-						)
-					);
-
-					if(!$result)
-						$errorsNb++;
-				 }
-			}
-
-			if($errorsNb)
+			if ($errorsNb)
 				$output .= $this->displayError($this->l('Unable to update this button'));
 			else
 				$output .= $this->displayConfirmation($this->l('Button updated'));
+
+			Tools::redirectAdmin('index.php?controller=AdminModules&configure='.$this->name.'&tab_module=&module_name='.$this->name.'&token='.Tools::getValue('token'));
 		}
 		else if(Tools::isSubmit('submitConfigure'))
 		{
@@ -292,46 +187,27 @@ class NavMegaDrownEvo extends Module
 
 			Tools::redirectAdmin('index.php?controller=AdminModules&configure='.$this->name.'&tab_module=&module_name='.$this->name.'&token='.Tools::getValue('token'));
 		}
-		else if(Tools::isSubmit('SubmitDetailSub'))
-		{
-			$id_button = Tools::getValue('id_button');
-
-			foreach ($languages as $language)
-			{
-				$result = Db::getInstance()->update('admevo_button_lang',
-					array(
-					  'detailSub'=>htmlentities(addslashes(Tools::getValue('detailSub_'.$language['id_lang'])))
-					),
-					'id_button='.(int)$id_button.' AND id_lang='.$language['id_lang']
-				);
-
-				if(!$result)
-					$errorsNb++;
-			}
-		}
-		else if(Tools::isSubmit('SubmitDetailSubTr'))
-		{
-			$id_button = Tools::getValue('id_button');
-
-			foreach ($languages as $language)
-			{
-				$result = Db::getInstance()->update('admevo_button_lang',
-					array(
-					  'detailSubTR'=>htmlentities(addslashes(Tools::getValue('detailSubTr_'.$language['id_lang'])))
-					),
-					'id_button='.(int)$id_button.' AND id_lang='.$language['id_lang']
-				);
-
-				if(!$result)
-					$errorsNb++;
-			}
-		}
 		else
 			$output .= $this->displayForm();
 
 		$this->_clearCache('cssnavmegadrownevo.tpl', $this->getCacheId());
 
 		return $output;
+	}
+
+	public function processSubmitButton($button)
+	{
+		$languages = Language::getLanguages();
+		foreach ($languages as $language)
+		{
+			$button->name_button[(int)$language['id_lang']] = pSQL(Tools::getValue('button_name_'.(int)$language['id_lang']));
+			$button->detailSubLeft[(int)$language['id_lang']] = pSQL(Tools::getValue('sub_left_'.(int)$language['id_lang']));
+			$button->detailSubTR[(int)$language['id_lang']] = pSQL(Tools::getValue('sub_tr_'.(int)$language['id_lang']));
+			$button->detailSub[(int)$language['id_lang']] = pSQL(Tools::getValue('sub_'.(int)$language['id_lang']));
+			$button->link[(int)$language['id_lang']] = pSQL(Tools::getValue('link_'.(int)$language['id_lang']));
+		}
+
+		return $button;
 	}
 
 	public function displayForm()
@@ -492,84 +368,9 @@ class NavMegaDrownEvo extends Module
 	{
 		$output = '';
 		if (Tools::getIsset('addbutton'))
-		{
-			$fields_form = array();
-
-			$languages = Language::getLanguages(false);
-			foreach ($languages as $k => $language)
-				$languages[$k]['is_default'] = (int)($language['id_lang'] == Configuration::get('PS_LANG_DEFAULT'));
-
-			$helper = new HelperForm();
-			$helper->module = $this;
-			$helper->name_controller = $this->name;
-			$helper->identifier = $this->identifier;
-			$helper->token = Tools::getAdminTokenLite('AdminModules');
-			$helper->languages = $languages;
-			$helper->currentIndex = AdminController::$currentIndex.'&configure='.$this->name;
-			$helper->default_form_language = (int)Configuration::get('PS_LANG_DEFAULT');
-			$helper->allow_employee_form_lang = true;
-			$helper->toolbar_scroll = true;
-			$helper->title = $this->displayName;
-			$helper->submit_action = 'submitAddButton';
-
-			$fields_form[0]['form'] = array(
-				'tinymce' => true,
-				'submit' => array(
-					'name' => $helper->submit_action,
-					'title' => $this->l('Save')
-				),
-				'input' => array()
-			);
-
-			$fields_form[0]['form']['input'][] = Fields::addField($this->l('Name'), 'button_name', null, '', true);
-
-			foreach ($languages as $language)
-				$helper->fields_value['button_name'][$language['id_lang']] = '';
-
-			$output .= $helper->generateForm($fields_form);
-		}
+			$output .= $this->initForm('add');
 		else if (Tools::getIsset('updatenavmegadrownevo'))
-		{
-			$button = new Button((int)Tools::getValue('id_button'));
-
-			$fields_form = array();
-
-			$languages = Language::getLanguages(false);
-			foreach ($languages as $k => $language)
-				$languages[$k]['is_default'] = (int)($language['id_lang'] == Configuration::get('PS_LANG_DEFAULT'));
-
-			$helper = new HelperForm();
-			$helper->module = $this;
-			$helper->name_controller = $this->name;
-			$helper->identifier = $this->identifier;
-			$helper->token = Tools::getAdminTokenLite('AdminModules');
-			$helper->languages = $languages;
-			$helper->currentIndex = AdminController::$currentIndex.'&configure='.$this->name;
-			$helper->default_form_language = (int)Configuration::get('PS_LANG_DEFAULT');
-			$helper->allow_employee_form_lang = true;
-			$helper->toolbar_scroll = true;
-			$helper->title = $this->displayName;
-			$helper->submit_action = 'submitAddButton';
-
-			$fields_form[0]['form'] = array(
-				'tinymce' => true,
-				'submit' => array(
-					'name' => $helper->submit_action,
-					'title' => $this->l('Save')
-				),
-				'input' => array()
-			);
-
-			$fields_form[0]['form']['input'][] = Fields::addField($this->l('Name'), 'button_name', null, '', true);
-
-			$details = new Button((int)Tools::getValue('id_button'));
-
-			// Lang Fields
-			foreach ($languages as $language)
-				$helper->fields_value['button_name'] = $details->name_button;
-
-			$output .= $helper->generateForm($fields_form);
-		}
+			$output .= $this->initForm('update');
 		else
 			$output .= '<p>'.$this->renderList().'</p>';
 
@@ -615,6 +416,79 @@ class NavMegaDrownEvo extends Module
 		}
 		else
 			return false;
+	}
+
+	private function initForm($type)
+	{
+		$fields_form = array();
+
+		$languages = Language::getLanguages(false);
+		foreach ($languages as $k => $language)
+			$languages[$k]['is_default'] = (int)($language['id_lang'] == Configuration::get('PS_LANG_DEFAULT'));
+
+		$helper = new HelperForm();
+		$helper->module = $this;
+		$helper->name_controller = $this->name;
+		$helper->identifier = $this->identifier;
+		$helper->token = Tools::getAdminTokenLite('AdminModules');
+		$helper->languages = $languages;
+		$helper->currentIndex = AdminController::$currentIndex.'&configure='.$this->name;
+		$helper->default_form_language = (int)Configuration::get('PS_LANG_DEFAULT');
+		$helper->allow_employee_form_lang = true;
+		$helper->toolbar_scroll = true;
+		$helper->title = $this->displayName;
+		$helper->submit_action = 'submit'.Tools::ucfirst($type).'Button';
+
+		$fields_form[0]['form'] = array(
+			'tinymce' => true,
+			'submit' => array(
+				'name' => $helper->submit_action,
+				'title' => $this->l('Save')
+			),
+			'input' => array()
+		);
+
+		//
+		$fields_form[0]['form']['input'][] = Fields::addField($this->l('Name'), 'button_name', null, '', true);
+		//
+		$fields_form[0]['form']['input'][] = Fields::addTextField($this->l('Line top'), 'sub_tr', null, '', true);
+		$fields_form[0]['form']['input'][] = Fields::addTextField($this->l('Left column'), 'sub_left', null, '', true);
+		$fields_form[0]['form']['input'][] = Fields::addTextField($this->l('Right column'), 'sub', null, '', true);
+		// Link
+		$fields_form[0]['form']['input'][] = Fields::addField($this->l('Link'), 'link', null, '', true);
+
+		if($type == 'update')
+			$fields_form[0]['form']['input'][] = Fields::addHiddenField('id_button');
+
+		if($type == 'add')
+		{
+			foreach ($languages as $language)
+			{
+				$helper->fields_value['button_name'][$language['id_lang']] = '';
+				$helper->fields_value['sub_left'][$language['id_lang']] = '';
+				$helper->fields_value['sub_tr'][$language['id_lang']] = '';
+				$helper->fields_value['sub'][$language['id_lang']] = '';
+				$helper->fields_value['link'][$language['id_lang']] = '';
+			}
+		}
+		else if($type == 'update')
+		{
+			$details = new Button((int)Tools::getValue('id_button'));
+
+			$helper->fields_value['id_button'] = (int)Tools::getValue('id_button');
+
+			// Lang Fields
+			//foreach ($languages as $language)
+			//{
+				$helper->fields_value['button_name'] = $details->name_button;
+				$helper->fields_value['sub_left'] = $details->detailSubLeft;
+				$helper->fields_value['sub_tr'] = $details->detailSubTR;
+				$helper->fields_value['sub'] = $details->detailSub;
+				$helper->fields_value['link'] = $details->link;
+			//}
+		}
+
+		return $helper->generateForm($fields_form);
 	}
 
 	public function processPosition()
