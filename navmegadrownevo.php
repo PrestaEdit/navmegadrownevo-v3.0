@@ -101,7 +101,7 @@ class NavMegaDrownEvo extends Module
 
 			$button = new Button();
 			$button->order_button = (int)$order_button;
-			$button->buttonColor = pSQL(Tools::getValue('button_color'));
+			$button->buttonColor = (Tools::getValue('use_color') ? pSQL(Tools::getValue('button_color')) : '');
 			$button = $this->processSubmitButton($button);
 
 			if(!$button->add())
@@ -452,14 +452,15 @@ class NavMegaDrownEvo extends Module
 
 		//
 		$fields_form[0]['form']['input'][] = Fields::addField($this->l('Name'), 'button_name', null, '', true);
+		// Colors
+		$fields_form[0]['form']['input'][] = Fields::addSwitchField($this->l('Use color'), 'use_color');
+		$fields_form[0]['form']['input'][] = Fields::addColorField($this->l('Button Color & background sub-menu'), 'button_color');
 		//
 		$fields_form[0]['form']['input'][] = Fields::addTextField($this->l('Line top'), 'sub_tr', null, '', true);
 		$fields_form[0]['form']['input'][] = Fields::addTextField($this->l('Left column'), 'sub_left', null, '', true);
 		$fields_form[0]['form']['input'][] = Fields::addTextField($this->l('Right column'), 'sub', null, '', true);
 		// Link
 		$fields_form[0]['form']['input'][] = Fields::addField($this->l('Link'), 'link', null, '', true);
-		// Colors
-		$fields_form[0]['form']['input'][] = Fields::addColorField($this->l('Button Color & background sub-menu'), 'button_color');
 
 		if($type == 'update')
 			$fields_form[0]['form']['input'][] = Fields::addHiddenField('id_button');
@@ -467,6 +468,7 @@ class NavMegaDrownEvo extends Module
 		if($type == 'add')
 		{
 			$helper->fields_value['button_color'] = '';
+			$helper->fields_value['use_color'] = false;
 			foreach ($languages as $language)
 			{
 				$helper->fields_value['button_name'][$language['id_lang']] = '';
@@ -483,16 +485,17 @@ class NavMegaDrownEvo extends Module
 			$helper->fields_value['id_button'] = (int)Tools::getValue('id_button');
 
 			$helper->fields_value['button_color'] = $button->buttonColor;
+			if($button->buttonColor != '')
+				$helper->fields_value['use_color'] = true;
+			else
+				$helper->fields_value['use_color'] = false;
 
 			// Lang Fields
-			//foreach ($languages as $language)
-			//{
-				$helper->fields_value['button_name'] = $button->name_button;
-				$helper->fields_value['sub_left'] = $button->detailSubLeft;
-				$helper->fields_value['sub_tr'] = $button->detailSubTR;
-				$helper->fields_value['sub'] = $button->detailSub;
-				$helper->fields_value['link'] = $button->link;
-			//}
+			$helper->fields_value['button_name'] = $button->name_button;
+			$helper->fields_value['sub_left'] = $button->detailSubLeft;
+			$helper->fields_value['sub_tr'] = $button->detailSubTR;
+			$helper->fields_value['sub'] = $button->detailSub;
+			$helper->fields_value['link'] = $button->link;
 		}
 
 		return $helper->generateForm($fields_form);
