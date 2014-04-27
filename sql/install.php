@@ -52,12 +52,13 @@
 	) ENGINE='._MYSQL_ENGINE_.' DEFAULT CHARSET=utf8';
 
 	$sql[] = 'CREATE TABLE IF NOT EXISTS `'._DB_PREFIX_.'admevo_button_lang` (
-	`id_button` INT NOT NULL ,
-	`id_lang` INT NOT NULL ,
-	`name_button` VARCHAR( 128 ) NOT NULL ,
-	`detailSubTR` BLOB NULL ,
-	`detailSub` BLOB NULL ,
-	`detailSubLeft` BLOB NULL ,
+	`id_button` INT NOT NULL,
+	`id_lang` INT NOT NULL,
+	`name_button` VARCHAR(128) NOT NULL,
+	`detailSubTR` TEXT NULL,
+	`detailSub` TEXT NULL,
+	`detailSubLeft` TEXT NULL,
+	`link` VARCHAR(255) NOT NULL,
 	PRIMARY KEY ( `id_button` , `id_lang` )
 	) ENGINE='._MYSQL_ENGINE_.' DEFAULT CHARSET=utf8';
 
@@ -82,11 +83,6 @@
 	`id_link_cat` INT NOT NULL,
 	`state` INT NOT NULL default 1,
 	`num_ligne` INT NOT NULL default 1
-	) ENGINE='._MYSQL_ENGINE_.' DEFAULT CHARSET=utf8';
-
-	$sql[] = 'CREATE TABLE IF NOT EXISTS `'._DB_PREFIX_.'admevo_button_link` (
-	`id_button` INT NOT NULL,
-	`link` LONGTEXT NULL
 	) ENGINE='._MYSQL_ENGINE_.' DEFAULT CHARSET=utf8';
 
 	$sql[] = 'CREATE TABLE IF NOT EXISTS `'._DB_PREFIX_.'admevo_custom_menu` (

@@ -41,6 +41,7 @@ function upgrade_module_3_0($object)
 	$sql[] = 'ALTER TABLE `'._DB_PREFIX_.'admevo_parameters` MODIFY COLUMN `backgroundTD3`  VARCHAR(7) DEFAULT \'\'';
 
 	$sql[] = 'ALTER TABLE `'._DB_PREFIX_.'admevo_button` MODIFY COLUMN `buttonColor`  VARCHAR(7) DEFAULT \'#383838\'';
+	$sql[] = 'ALTER TABLE `'._DB_PREFIX_.'admevo_button` ADD COLUMN `link`  VARCHAR(255) NULL';
 
 	//$sql[] = 'UPDATE `'._DB_PREFIX_.'admevo_parameters` SET `stateTD1`=\'1\'';
 

@@ -35,6 +35,10 @@ class Button extends ObjectModel
 	public $img_name_background;
 
 	public $name_button;
+	public $detailSub;
+	public $detailSubTR;
+	public $detailSubLeft;
+	public $link;
 
 	public static $definition = array(
 		'table' => 'admevo_button',
@@ -47,7 +51,11 @@ class Button extends ObjectModel
 			'buttonColor' => 			array('type' => self::TYPE_STRING),
 			'img_name_background' =>	array('type' => self::TYPE_STRING),
 			// Lang fields
-			'name_button' => 				array('type' => self::TYPE_STRING, 'lang' => true, 'validate' => 'isCatalogName', 'required' => true, 'size' => 128),
+			'name_button' => 			array('type' => self::TYPE_STRING, 'lang' => true, 'validate' => 'isCatalogName', 'required' => true, 'size' => 128),
+			'detailSub' => 				array('type' => self::TYPE_STRING, 'lang' => true, 'validate' => 'isCleanHtml'),
+			'detailSubTR' => 			array('type' => self::TYPE_STRING, 'lang' => true, 'validate' => 'isCleanHtml'),
+			'detailSubLeft' => 			array('type' => self::TYPE_STRING, 'lang' => true, 'validate' => 'isCleanHtml'),
+			'link' => 					array('type' => self::TYPE_STRING, 'lang' => true, 'validate' => 'isCleanHtml'),
 		),
 	);
 }
