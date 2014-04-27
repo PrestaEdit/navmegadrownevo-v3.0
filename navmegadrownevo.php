@@ -567,15 +567,8 @@ class NavMegaDrownEvo extends Module
 			{
 				$id_button = (int)$ValButton['id_button'];
 
-				$tabLinkButton[$id_button] = array();
 				$tabIdLinkCat[$id_button] = array();
 				$tabLinkCustom[$id_button] = array();
-				$LinkButton = MegaDrownEvo::getButtonLinks($id_button);
-				if(array_key_exists( 0, $LinkButton))
-					$linkButton = $LinkButton[0]['link'];
-				else
-					$linkButton = "";
-				$tabLinkButton[$id_button][] = basename($linkButton);
 
 				$CatMenu 	= array();
 				$CatMenu 	= MegaDrownEvo::getButtonLinksCat($id_button);
@@ -619,11 +612,17 @@ class NavMegaDrownEvo extends Module
 			{
 				$id_button = (int)$ValButton['id_button'];
 
-				$LinkButton = MegaDrownEvo::getButtonLinks($id_button);
-				(!array_key_exists(0 , $LinkButton)) ? $linkButton = "#" : $linkButton = $LinkButton[0]['link'];
+				if($ValButton['link'] != '')
+					$linkButton = $ValButton['link'];
+				else
+					$linkButton = "#";
+
 				$this->_menu .= '<li style="background-color: '.$ValButton['buttonColor'].'" class="liBouton liBouton'.$b.'">'.$this->eol;
 				strpos(strtolower($ValButton['name_button']), "<br />") ? $decal="margin-top : -5px;" : $decal="" ;
-				$this->_menu .= '<div'.($decal!=0 ? ' style="'.$decal.'"' : '').'><a href="'.$linkButton.'" '.($linkButton=="#" ? "onclick='return false'" : false).' class="buttons" '.(in_array($active_category, $tabIdLinkCat[$ValButton['id_button']]) || in_array(basename($_SERVER['REQUEST_URI']), $tabLinkCustom[$ValButton['id_button']]) || in_array(basename($_SERVER['REQUEST_URI']), $tabLinkButton[$ValButton['id_button']]) ? 'style="background-position : 0 -'.$MDParameters['MenuHeight'].'px; color: #'.$MDParameters['ColorFontMenuHover'].'"' : false ).'>'.$ValButton['name_button'].'</a></div>'.$this->eol;
+				$this->_menu .= '<div'.($decal!=0 ? ' style="'.$decal.'"' : '').'>
+									<a href="'.$linkButton.'" '.($linkButton == "#" ? "onclick='return false'" : false).' class="buttons" '.((in_array($active_category, $tabIdLinkCat[$ValButton['id_button']]) || basename($_SERVER['REQUEST_URI']) == $linkButton) ? 'style="background-position : 0 -'.$MDParameters['MenuHeight'].'px; color: #'.$MDParameters['ColorFontMenuHover'].'"' : false).'>'.$ValButton['name_button'].'
+									</a>
+								</div>'.$this->eol;
 				$CatMenu 	= MegaDrownEvo::getButtonLinksCat($ValButton['id_button']);
 				$CustomMenu = MegaDrownEvo::getButtonLinksCustom($ValButton['id_button'], $this->context->language->id);
 				$NbColsMax 	= MegaDrownEvo::getMaxColumns($ValButton['id_button']);
