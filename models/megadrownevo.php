@@ -46,8 +46,8 @@ class MegaDrownEvo
 	static public function getButtonLinks($id_button)
 	{
 		return Db::getInstance()->ExecuteS('
-		SELECT *
-		FROM '._DB_PREFIX_.'admevo_button_link WHERE id_button='.(int)$id_button.'
+			SELECT *
+			FROM '._DB_PREFIX_.'admevo_button_link WHERE id_button='.(int)$id_button.'
 		');
 	}
 
