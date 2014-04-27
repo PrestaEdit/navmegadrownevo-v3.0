@@ -101,6 +101,7 @@ class NavMegaDrownEvo extends Module
 
 			$button = new Button();
 			$button->order_button = (int)$order_button;
+			$button->buttonColor = pSQL(Tools::getValue('button_color'));
 			$button = $this->processSubmitButton($button);
 
 			if(!$button->add())
@@ -116,6 +117,7 @@ class NavMegaDrownEvo extends Module
 		else if (Tools::isSubmit('submitUpdateButton'))
 		{
 			$button = new Button((int)Tools::getValue('id_button'));
+			$button->buttonColor = pSQL(Tools::getValue('button_color'));
 			$button = $this->processSubmitButton($button);
 
 			if(!$button->update())
@@ -456,12 +458,15 @@ class NavMegaDrownEvo extends Module
 		$fields_form[0]['form']['input'][] = Fields::addTextField($this->l('Right column'), 'sub', null, '', true);
 		// Link
 		$fields_form[0]['form']['input'][] = Fields::addField($this->l('Link'), 'link', null, '', true);
+		// Colors
+		$fields_form[0]['form']['input'][] = Fields::addColorField($this->l('Button Color & background sub-menu'), 'button_color');
 
 		if($type == 'update')
 			$fields_form[0]['form']['input'][] = Fields::addHiddenField('id_button');
 
 		if($type == 'add')
 		{
+			$helper->fields_value['button_color'] = '';
 			foreach ($languages as $language)
 			{
 				$helper->fields_value['button_name'][$language['id_lang']] = '';
@@ -473,18 +478,20 @@ class NavMegaDrownEvo extends Module
 		}
 		else if($type == 'update')
 		{
-			$details = new Button((int)Tools::getValue('id_button'));
+			$button = new Button((int)Tools::getValue('id_button'));
 
 			$helper->fields_value['id_button'] = (int)Tools::getValue('id_button');
+
+			$helper->fields_value['button_color'] = $button->buttonColor;
 
 			// Lang Fields
 			//foreach ($languages as $language)
 			//{
-				$helper->fields_value['button_name'] = $details->name_button;
-				$helper->fields_value['sub_left'] = $details->detailSubLeft;
-				$helper->fields_value['sub_tr'] = $details->detailSubTR;
-				$helper->fields_value['sub'] = $details->detailSub;
-				$helper->fields_value['link'] = $details->link;
+				$helper->fields_value['button_name'] = $button->name_button;
+				$helper->fields_value['sub_left'] = $button->detailSubLeft;
+				$helper->fields_value['sub_tr'] = $button->detailSubTR;
+				$helper->fields_value['sub'] = $button->detailSub;
+				$helper->fields_value['link'] = $button->link;
 			//}
 		}
 
