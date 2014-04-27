@@ -17,6 +17,32 @@ class Fields
 		return $field;
 	}
 
+	public static function addHiddenField($name)
+	{
+		$field = array(
+			'type' => 'hidden',
+			'name' => $name
+		);
+
+		return $field;
+	}
+
+	public static function addTextField($label, $name, $prefix = null, $class = '', $lang = false)
+	{
+		$field = array(
+			'label' => $label,
+			'name' => $name,
+			'required' => true,
+			'type' => 'textarea',
+			'autoload_rte' => true,
+			'prefix' => $prefix,
+			'class' => $class,
+			'lang' => $lang
+		);
+
+		return $field;
+	}
+
 	public static function addColorField($label, $name, $suffix = null)
 	{
 		return array(
