@@ -172,7 +172,7 @@ class NavMegaDrownEvo extends Module
 
 			$this->_clearCache('cssnavmegadrownevo.tpl', $this->getCacheId());
 
-			Tools::redirectAdmin('index.php?controller=AdminModules&configure='.$this->name.'&tab_module=&module_name='.$this->name.'&token='.Tools::getValue('token'));
+			Tools::redirectAdmin('index.php?controller=AdminModules&configure='.$this->name.'&tab_active=configure&module_name='.$this->name.'&token='.Tools::getValue('token'));
 		}
 		else if(Tools::getIsset('deletenavmegadrownevo'))
 		{
@@ -346,17 +346,22 @@ class NavMegaDrownEvo extends Module
 
 		$helper->fields_value = $this->getFieldsValue();
 
+		if(Tools::getValue('tab_active') == 'configure')
+			$configure_active = true;
+		else
+			$configure_active = false;
+
 		$output .= '<div class="tabbable">
 						<ul class="nav nav-tabs">
-							<li><a href="#pane1" data-toggle="tab"><i class="icon-cogs"></i> '.$this->l('Settings').'</a></li>
-					    	<li class="active"><a href="#pane2" data-toggle="tab"><i class="icon-list-alt"></i> '.$this->l('Menu').'</a></li>
+							<li '.($configure_active ? 'class="active"' : '').'><a href="#pane1" data-toggle="tab"><i class="icon-cogs"></i> '.$this->l('Settings').'</a></li>
+					    	<li '.($configure_active ? '' : 'class="active"').'><a href="#pane2" data-toggle="tab"><i class="icon-list-alt"></i> '.$this->l('Menu').'</a></li>
 						</ul>
 						<div class="tab-content">
-						    <div id="pane1" class="tab-pane">
+						    <div id="pane1" class="tab-pane '.($configure_active ? 'in active' : '').'">
 						    	'.$helper->generateForm($this->fields_form).'
 						    </div>
 
-						    <div id="pane2" class="tab-pane in active">
+						    <div id="pane2" class="tab-pane '.($configure_active ? '' : 'in active').'">
 						    	'.$this->renderTabPane().'
 						    </div>
 						</div>
