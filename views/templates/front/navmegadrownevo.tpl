@@ -1,5 +1,8 @@
 <!-- MeGa DrOwN mEnU Evolution v3.0 -->
 	{*<div style="padding-bottom: {$MarginBottomEvo}px; padding-top: {$MarginTopEvo}px ">*}
+	<style type="text/css">
+		{$css_megadrownevo}
+	</style>
 	<div>
 		<div class="container">
 			<ul id="topnavEvo">

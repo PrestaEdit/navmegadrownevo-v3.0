@@ -631,7 +631,10 @@ class NavMegaDrownEvo extends Module
 				else
 					$linkButton = "#";
 
-				$this->_menu .= '<li style="background-color: '.$ValButton['buttonColor'].'" class="liBouton liBouton'.$b.'">'.$this->eol;
+				if($ValButton['buttonColor'] != '')
+						$this->_css .= '.liBouton'.$b.' { background-color: '.$ValButton['buttonColor'].' }'.$this->eol;;
+
+				$this->_menu .= '<li class="liBouton liBouton'.$b.'">'.$this->eol;
 				strpos(strtolower($ValButton['name_button']), "<br />") ? $decal="margin-top : -5px;" : $decal="" ;
 				$this->_menu .= '<div'.($decal!=0 ? ' style="'.$decal.'"' : '').'>
 									<a href="'.$linkButton.'" '.($linkButton == "#" ? "onclick='return false'" : false).' class="buttons" '.((in_array($active_category, $tabIdLinkCat[$ValButton['id_button']]) || basename($_SERVER['REQUEST_URI']) == $linkButton) ? 'style="background-position : 0 -'.$MDParameters['MenuHeight'].'px; color: #'.$MDParameters['ColorFontMenuHover'].'"' : false).'>'.$ValButton['name_button'].'
@@ -852,6 +855,7 @@ class NavMegaDrownEvo extends Module
 	public function hookDisplayTop($param)
 	{
 		$this->makeMegaDrown();
+		$this->context->smarty->assign('css_megadrownevo', $this->_css);
 		$this->context->smarty->assign('menuMDEvo', $this->_menu);
 		$this->context->smarty->assign('search_bar', $this->_searchBar);
 
