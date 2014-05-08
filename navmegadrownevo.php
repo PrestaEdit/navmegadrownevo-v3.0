@@ -198,6 +198,7 @@ class NavMegaDrownEvo extends Module
 	public function processSubmitButton($button)
 	{
 		$button->buttonColor = (Tools::getValue('use_color') ? pSQL(Tools::getValue('button_color')) : '');
+
 		$languages = Language::getLanguages();
 		foreach ($languages as $language)
 		{
@@ -306,10 +307,12 @@ class NavMegaDrownEvo extends Module
 
 		$this->fields_form[0]['form']['input'][] = Fields::addColorField($this->l('General color'), 'GeneralColor');
 
+		/*
 		$this->fields_form[0]['form']['input'][] = Fields::addFreeField($this->l('Picture Menu'), 'PictureMenu', 'px');
 		$this->fields_form[0]['form']['input'][] = Fields::addFreeField($this->l('Picture Button'), 'PictureButton', 'px');
 		$this->fields_form[0]['form']['input'][] = Fields::addFreeField($this->l('Picture List arrow'), 'PictureListArrow', 'px');
 		$this->fields_form[0]['form']['input'][] = Fields::addFreeField($this->l('Picture background submenu'), 'PicturebackSubMenu', 'px');
+		*/
 
 		$this->fields_form[0]['form']['input'][] = Fields::addSwitchField($this->l('Search'), 'SearchBar', 'px');
 
@@ -877,44 +880,7 @@ class NavMegaDrownEvo extends Module
 			$MDParameters['sub_bg'] 			= $this->checkIfImageExist('sub_bg', $MDParameters['extensionBack']);
 			*/
 
-			$MDParameters['bg_menu'] 			= '';
-			$MDParameters['bg_bout'] 			= '';
-			$MDParameters['navlist_arrow'] 		= '';
-			$MDParameters['sub_bg'] 			= '';
-
-
-			$this->context->smarty->assign(array(
-				'MenuWidthEvo' => ($MDParameters['MenuWidth'] - $MDParameters['paddingLeft']),
-				'MenuHeightEvo' => $MDParameters['MenuHeight'],
-				'MinButtonWidthEvo' => $MDParameters['MinButtonWidth'],
-				'MaxButtonWidthEvo' => $MDParameters['MaxButtonWidth'],
-				'GeneralColorEvo' => $MDParameters['GeneralColor'],
-				'FontSizeMenuEvo' => $MDParameters['FontSizeMenu'],
-				'FontSizeSubMenuEvo' => $MDParameters['FontSizeSubMenu'],
-				'FontSizeSubSubMenuEvo' => $MDParameters['FontSizeSubSubMenu'],
-				'ColorFontMenuEvo' => $MDParameters['ColorFontMenu'],
-				'ColorFontSubMenuEvo' => $MDParameters['ColorFontSubMenu'],
-				'ColorFontSubSubMenuEvo' => $MDParameters['ColorFontSubSubMenu'],
-				'ColorFontMenuHoverEvo' => $MDParameters['ColorFontMenuHover'],
-				'ColorFontSubMenuHoverEvo' => $MDParameters['ColorFontSubMenuHover'],
-				'ColorFontSubSubMenuHoverEvo' => $MDParameters['ColorFontSubSubMenuHover'],
-				'widthTD1Evo' => $MDParameters['widthTD1'],
-				'widthTD3Evo' => $MDParameters['widthTD3'],
-				'bgColorTR1Evo' => $MDParameters['backgroundTR1'],
-				'bgColorTD1Evo' => $MDParameters['backgroundTD1'],
-				'bgColorTD2Evo' => $MDParameters['backgroundTD2'],
-				'bgColorTD3Evo' => $MDParameters['backgroundTD3'],
-				'VerticalPaddingEvo' => $MDParameters['VerticalPadding'],
-				'ColumnWidthEvo' => $MDParameters['columnSize'],
-				'PaddingLeftEvo' => $MDParameters['paddingLeft'],
-				'MarginTopEvo' => $MDParameters['marginTop'],
-				'MarginBottomEvo' => $MDParameters['marginBottom'],
-				'bg_menuEvo' => $MDParameters['bg_menu'],
-				'bg_boutEvo' => $MDParameters['bg_bout'],
-				'navlist_arrowEvo' => $MDParameters['navlist_arrow'],
-				'sub_bgEvo' => $MDParameters['sub_bg'] )
-			);
-
+			$this->context->smarty->assign('MDParameters', $MDParameters);
 			$this->context->smarty->assign('pathMDEvo', $this->_path);
 		}
 
