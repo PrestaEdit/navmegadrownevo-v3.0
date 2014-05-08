@@ -101,7 +101,6 @@ class NavMegaDrownEvo extends Module
 
 			$button = new Button();
 			$button->order_button = (int)$order_button;
-			$button->buttonColor = (Tools::getValue('use_color') ? pSQL(Tools::getValue('button_color')) : '');
 			$button = $this->processSubmitButton($button);
 
 			if(!$button->add())
@@ -117,7 +116,6 @@ class NavMegaDrownEvo extends Module
 		else if (Tools::isSubmit('submitUpdateButton'))
 		{
 			$button = new Button((int)Tools::getValue('id_button'));
-			$button->buttonColor = pSQL(Tools::getValue('button_color'));
 			$button = $this->processSubmitButton($button);
 
 			if(!$button->update())
@@ -199,6 +197,7 @@ class NavMegaDrownEvo extends Module
 
 	public function processSubmitButton($button)
 	{
+		$button->buttonColor = (Tools::getValue('use_color') ? pSQL(Tools::getValue('button_color')) : '');
 		$languages = Language::getLanguages();
 		foreach ($languages as $language)
 		{
