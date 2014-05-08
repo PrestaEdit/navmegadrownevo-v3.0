@@ -636,7 +636,7 @@ class NavMegaDrownEvo extends Module
 
 				$this->_menu .= '<li class="liBouton liBouton'.$b.'">'.$this->eol;
 				strpos(strtolower($ValButton['name_button']), "<br />") ? $decal="margin-top : -5px;" : $decal="" ;
-				$this->_menu .= '<div'.($decal!=0 ? ' style="'.$decal.'"' : '').'>
+				$this->_menu .= '<div'.($decal != 0 ? ' style="'.$decal.'"' : '').'>
 									<a href="'.$linkButton.'" '.($linkButton == "#" ? "onclick='return false'" : false).' class="buttons" '.((in_array($active_category, $tabIdLinkCat[$ValButton['id_button']]) || basename($_SERVER['REQUEST_URI']) == $linkButton) ? 'style="background-position : 0 -'.$MDParameters['MenuHeight'].'px; color: #'.$MDParameters['ColorFontMenuHover'].'"' : false).'>'.$ValButton['name_button'].'
 									</a>
 								</div>'.$this->eol;
