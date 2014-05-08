@@ -24,7 +24,7 @@ include(dirname(__FILE__).'/models/button.php');
 
 class NavMegaDrownEvo extends Module
 {
-	private $_style = '';
+	private $_css = '';
 	private $_menu = '';
 	private $_searchBar = 0;
 	private $_html = '';
