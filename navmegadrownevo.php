@@ -576,7 +576,8 @@ class NavMegaDrownEvo extends Module
 		/* END: ACTIVE CATEGORY */
 
 		$MDParameters = MegaDrownEvo::getParameters();
-		$this->_searchBar = (int)$MDParameters['SearchBar'];
+		$this->_menu_tpl['parameters'] = $MDParameters;
+		$this->_menu_tpl['search_bar'] = (int)$MDParameters['SearchBar'];
 
 		$MDConfiguration = MegaDrownEvo::getConfigurations((int)$this->context->language->id);
 		if(sizeof($MDConfiguration))
@@ -648,16 +649,9 @@ class NavMegaDrownEvo extends Module
 				if($ValButton['buttonColor'] != '')
 						$this->_css .= '.liBouton'.$b.' { background-color: '.$ValButton['buttonColor'].' }'.$this->eol;
 
-				/*
-				$this->_menu .= '<li class="liBouton liBouton'.$b.'">'.$this->eol;
-				$this->_menu .= '<div'.($this->_menu_tpl['li'][$b]['decal'] != 0 ? ' style="'.$this->_menu_tpl['li'][$b]['decal'].'"' : '').'>
-									<a href="'.$link_button.'" '.($link_button == "#" ? "onclick='return false'" : false).' class="buttons" '.((in_array($active_category, $tabIdLinkCat[$ValButton['id_button']]) || basename($_SERVER['REQUEST_URI']) == $link_button) ? 'style="background-position : 0 -'.$MDParameters['MenuHeight'].'px; color: #'.$MDParameters['ColorFontMenuHover'].'"' : false).'>'.$ValButton['name_button'].'
-									</a>
-								</div>'.$this->eol;
-				*/
-				$CatMenu 	= MegaDrownEvo::getButtonLinksCat($ValButton['id_button']);
-				$CustomMenu = MegaDrownEvo::getButtonLinksCustom($ValButton['id_button'], $this->context->language->id);
-				$NbColsMax 	= MegaDrownEvo::getMaxColumns($ValButton['id_button']);
+				$CatMenu 	= MegaDrownEvo::getButtonLinksCat((int)$id_button);
+				$CustomMenu = MegaDrownEvo::getButtonLinksCustom((int)$id_button, $this->context->language->id);
+				$NbColsMax 	= MegaDrownEvo::getMaxColumns((int)$id_button);;
 				$MaxCols	= 0;
 				$MaxLines	= 0;
 				$tabLines	= array();
@@ -693,35 +687,30 @@ class NavMegaDrownEvo extends Module
 				{
 					if(sizeof($tabLines[$kButton]))
 					{
-						$this->_menu .= '<div class="sub" style="width: '.($MDParameters['MenuWidth'] - 2).'px;  background-color: '.$ValButton['buttonColor'].'; '.($ValButton['img_name_background']!="" ? 'background-image: url('.$this->_path.'views/img/menu/'.$ValButton['img_name_background'].'); background-repeat:no-repeat; background-position:top left; ' : false).' ">'.$this->eol;
-						$this->_menu .= '<table class="megaDrownTable" cellpadding="0" cellspacing="0" width="100%">';
+						$this->_menu_tpl['li'][$b]['sub'] = 1;
+						$this->_menu_tpl['li'][$b]['sub']['bg_color'] = $ValButton['buttonColor'];
+
 						if($MDParameters['stateTR1'])
 						{
-							$this->_menu .= '<tr style="height:'.$MDParameters['heightTR1'].'px">';
-								($MDParameters['stateTD1'] ? $nbColspan = 2 : $nbColspan = 1);
-								$this->_menu .= '<td class="megaDrownTR1" valign="top" colspan="'.$nbColspan.'">'.$this->eol;
-								$this->_menu .= $ValButton['detailSubTR']=="" ? "&nbsp;" : html_entity_decode($ValButton['detailSubTR']);
-								$this->_menu .= '</td>';
-								$this->_menu .= '<td rowspan="2" class="megaDrownTD3" valign="top" style="width:'.$MDParameters['widthTD3'].'px">'.($ValButton['detailSub']=="" ? "&nbsp;" : html_entity_decode($ValButton['detailSub'])).'</td>'.$this->eol;
-							$this->_menu .= '</tr>';
+							$this->_menu_tpl['li'][$b]['tr1'] = 1;
+							$this->_menu_tpl['li'][$b]['tr1']['details']['sub_tr'] = html_entity_decode($ValButton['detailSubTR']);
+							$this->_menu_tpl['li'][$b]['tr1']['details']['sub'] = html_entity_decode($ValButton['detailSub']);
 						}
-						$this->_menu .= '<tr>';
+
 						if($MDParameters['stateTD1'])
 						{
-							$this->_menu .= '<td class="megaDrownTD1" valign="top" style="width:'.$MDParameters['widthTD1'].'px">'.$this->eol;
-							if($ValButton['img_name'] != '') {
-								if($ValButton['img_link'] != '')
-									$this->_menu .= '<a href="'.urldecode($ValButton['img_link']).'" style="float:none; margin:0; padding:0">';
-								$this->_menu .= '<img src="'.$this->_path.'views/img/menu/'.$ValButton['img_name'].'" style="border:0px" alt="'.$ValButton['img_name'].'"/>'.$this->eol;
-								if($ValButton['img_link'] != '')
-									$this->_menu .= '</a>';
+							$this->_menu_tpl['li'][$b]['td1'] = 1;
+							if($ValButton['img_name'] != '')
+							{
+								$this->_menu_tpl['li'][$b]['td1']['img'] = 1;
+								$this->_menu_tpl['li'][$b]['td1']['img']['link'] = urldecode($ValButton['img_link']);
+								$this->_menu_tpl['li'][$b]['td1']['img']['name'] = $ValButton['img_name'];
 							}
-							$this->_menu .= '<br />'.html_entity_decode($ValButton['detailSubLeft']).'</td>';
+							$this->_menu_tpl['li'][$b]['td1']['details'] = html_entity_decode($ValButton['detailSubLeft']);
 						}
-						$this->_menu .= '<td class="megaDrownTD2" valign="top">'.$this->eol;
-						$this->_menu .= '<table class="MegaEvoLinks" style="border:0px">'.$this->eol;
-						$this->_menu .= '<tr>'.$this->eol;
-						for($c=1; $c<=$MaxCols; $c++) {
+
+						for($c=1; $c<=$MaxCols; $c++)
+						{
 							$this->_menu .= '<td valign="top">'.$this->eol;
 							for($l=1; $l<=$MaxLines; $l++)
 							{
@@ -814,16 +803,16 @@ class NavMegaDrownEvo extends Module
 							}
 							$this->_menu .= '</td>'.$this->eol;
 						}
-						$this->_menu .= '</tr>'.$this->eol;
-						$this->_menu .= '</table>'.$this->eol;
-						$this->_menu .= '</td>'.$this->eol;
+
 						//Colonne droite;
 						if($MDParameters['stateTD3'] && !$MDParameters['stateTR1'])
-							$this->_menu .= '<td class="megaDrownTD3" valign="top" style="width:'.$MDParameters['widthTD3'].'px">'.($ValButton['detailSub']=="" ? "&nbsp;" : html_entity_decode($ValButton['detailSub'])).'</td>'.$this->eol;
-						$this->_menu .= '</tr></table></div>'.$this->eol;
+						{
+							$this->_menu_tpl['li'][$b]['td3'] = 1;
+							$this->_menu_tpl['li'][$b]['td3']['details'] = html_entity_decode($ValButton['detailSub']);
+						}
 					}
 				}
-				/*$this->_menu .= '</li>'.$this->eol;*/
+
 				$b++;
 			}
 		}
