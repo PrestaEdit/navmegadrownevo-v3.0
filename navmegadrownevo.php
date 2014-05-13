@@ -26,6 +26,7 @@ class NavMegaDrownEvo extends Module
 {
 	private $_css = '';
 	private $_menu = '';
+	private $_menu_tpl = array();
 	private $_searchBar = 0;
 	private $_html = '';
 
@@ -627,22 +628,33 @@ class NavMegaDrownEvo extends Module
 			$b = 0;
 			foreach($MDConfiguration as $kButton => $ValButton)
 			{
+				$this->_menu_tpl['li'][$b] = array();
+
 				$id_button = (int)$ValButton['id_button'];
 
+				$this->_menu_tpl['li'][$b]['id_button'] = (int)$id_button;
+				$this->_menu_tpl['li'][$b]['name'] = $ValButton['name_button'];
+
+				strpos(strtolower($this->_menu_tpl['li'][$b]['name']), "<br />") ? $this->_menu_tpl['li'][$b]['decal'] = "margin-top : -5px;" : $this->_menu_tpl['li'][$b]['decal'] = "";
+
 				if($ValButton['link'] != '')
-					$linkButton = $ValButton['link'];
+					$this->_menu_tpl['li'][$b]['link_button'] = $ValButton['link'];
 				else
-					$linkButton = "#";
+					$this->_menu_tpl['li'][$b]['link_button'] = "#";
+
+				($this->_menu_tpl['li'][$b]['link_button'] == "#" ? $this->_menu_tpl['li'][$b]['onclick'] = 1 : $this->_menu_tpl['li'][$b]['onclick'] = 0);
+				((in_array($active_category, $tabIdLinkCat[$ValButton['id_button']]) || basename($_SERVER['REQUEST_URI']) == $this->_menu_tpl['li'][$b]['link_button']) ? $this->_menu_tpl['li'][$b]['style'] = 'background-position : 0 -'.$MDParameters['MenuHeight'].'px; color: #'.$MDParameters['ColorFontMenuHover'] : $this->_menu_tpl['li'][$b]['style'] = '');
 
 				if($ValButton['buttonColor'] != '')
-						$this->_css .= '.liBouton'.$b.' { background-color: '.$ValButton['buttonColor'].' }'.$this->eol;;
+						$this->_css .= '.liBouton'.$b.' { background-color: '.$ValButton['buttonColor'].' }'.$this->eol;
 
+				/*
 				$this->_menu .= '<li class="liBouton liBouton'.$b.'">'.$this->eol;
-				strpos(strtolower($ValButton['name_button']), "<br />") ? $decal="margin-top : -5px;" : $decal="" ;
-				$this->_menu .= '<div'.($decal != 0 ? ' style="'.$decal.'"' : '').'>
-									<a href="'.$linkButton.'" '.($linkButton == "#" ? "onclick='return false'" : false).' class="buttons" '.((in_array($active_category, $tabIdLinkCat[$ValButton['id_button']]) || basename($_SERVER['REQUEST_URI']) == $linkButton) ? 'style="background-position : 0 -'.$MDParameters['MenuHeight'].'px; color: #'.$MDParameters['ColorFontMenuHover'].'"' : false).'>'.$ValButton['name_button'].'
+				$this->_menu .= '<div'.($this->_menu_tpl['li'][$b]['decal'] != 0 ? ' style="'.$this->_menu_tpl['li'][$b]['decal'].'"' : '').'>
+									<a href="'.$link_button.'" '.($link_button == "#" ? "onclick='return false'" : false).' class="buttons" '.((in_array($active_category, $tabIdLinkCat[$ValButton['id_button']]) || basename($_SERVER['REQUEST_URI']) == $link_button) ? 'style="background-position : 0 -'.$MDParameters['MenuHeight'].'px; color: #'.$MDParameters['ColorFontMenuHover'].'"' : false).'>'.$ValButton['name_button'].'
 									</a>
 								</div>'.$this->eol;
+				*/
 				$CatMenu 	= MegaDrownEvo::getButtonLinksCat($ValButton['id_button']);
 				$CustomMenu = MegaDrownEvo::getButtonLinksCustom($ValButton['id_button'], $this->context->language->id);
 				$NbColsMax 	= MegaDrownEvo::getMaxColumns($ValButton['id_button']);
@@ -653,14 +665,9 @@ class NavMegaDrownEvo extends Module
 
 				if(sizeof($CatMenu))
 				{
-					foreach($CatMenu as $kMenu=>$ValCat)
+					foreach($CatMenu as $kMenu => $ValCat)
 					{
 						$tabLines[$kButton][$ValCat['num_ligne']] 									= $ValCat['num_ligne'];
-						$tabLinesOrder[$kButton][$ValCat['num_ligne']][$ValCat['num_column']] 		= $ValCat['num_column'];
-						$tabLinesDatas[$kButton][$ValCat['num_ligne']][$ValCat['num_column']][$m]	= $ValCat;
-						$tabLinesType[$kButton][$ValCat['num_ligne']][$ValCat['num_column']][$m]	= 'category';
-						$tabColumn[$kButton][$ValCat['num_ligne']] 									= $ValCat['num_column'];
-						$tabColumnOrder[$kButton][$ValCat['num_column']][$ValCat['num_ligne']] 		= $ValCat['num_ligne'];
 						$tabColumnDatas[$kButton][$ValCat['num_column']][$ValCat['num_ligne']][$m]	= $ValCat;
 						$tabColumnType[$kButton][$ValCat['num_column']][$ValCat['num_ligne']][$m]	= 'category';
 						$m++;
@@ -671,14 +678,9 @@ class NavMegaDrownEvo extends Module
 
 				if(sizeof($CustomMenu))
 				{
-					foreach($CustomMenu as $kCustom=>$ValCustom)
+					foreach($CustomMenu as $kCustom => $ValCustom)
 					{
 						$tabLines[$kButton][$ValCustom['num_ligne']] 										= $ValCustom['num_ligne'];
-						$tabLinesOrder[$kButton][$ValCustom['num_ligne']][$ValCustom['num_column']] 		= $ValCustom['num_column'];
-						$tabLinesDatas[$kButton][$ValCustom['num_ligne']][$ValCustom['num_column']][$m]		= $ValCustom;
-						$tabLinesType[$kButton][$ValCustom['num_ligne']][$ValCustom['num_column']][$m]		= 'custom';
-						$tabColumn[$kButton][$ValCustom['num_ligne']] 										= $ValCustom['num_column'];
-						$tabColumnOrder[$kButton][$ValCustom['num_column']][$ValCustom['num_ligne']] 		= $ValCustom['num_ligne'];
 						$tabColumnDatas[$kButton][$ValCustom['num_column']][$ValCustom['num_ligne']][$m]	= $ValCustom;
 						$tabColumnType[$kButton][$ValCustom['num_column']][$ValCustom['num_ligne']][$m]		= 'custom';
 						$m++;
@@ -821,7 +823,7 @@ class NavMegaDrownEvo extends Module
 						$this->_menu .= '</tr></table></div>'.$this->eol;
 					}
 				}
-				$this->_menu .= '</li>'.$this->eol;
+				/*$this->_menu .= '</li>'.$this->eol;*/
 				$b++;
 			}
 		}
@@ -862,7 +864,11 @@ class NavMegaDrownEvo extends Module
 		$this->context->smarty->assign('menuMDEvo', $this->_menu);
 		$this->context->smarty->assign('search_bar', $this->_searchBar);
 
-		return $this->display(__FILE__, 'views/templates/front/navmegadrownevo.tpl');
+
+		$this->context->smarty->assign('menu', $this->_menu_tpl);
+		ppp($this->_menu_tpl);
+
+		return $this->display(__FILE__, 'views/templates/front/navmegadrownevo_wip.tpl');
 	}
 
   	public function hookDisplayHeader($params)
