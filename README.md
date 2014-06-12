@@ -5,6 +5,8 @@ Menu Mega Drown Evolution v3.0, pour PrestaShop 1.6
 
 ***La v3.0 est toujours au stade développement.***
 
+Vous pouvez retrouver le module pour PrestaShop 1.5 ici: https://github.com/PrestaEdit/navmegadrownevo-v2.0
+
 ## Todo
 - [x] Ajout du formulaire d'ajout/édition d'un menu
 - [] Gérer les positions
