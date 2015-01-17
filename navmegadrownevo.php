@@ -5,7 +5,7 @@
  * @category   	Module / front_office_features
  * @author     	PrestaEdit <j.danse@prestaedit.com> (since 2.0)
  * @author     	DevForEver (special thanks to him)
- * @copyright  	2014 PrestaEdit
+ * @copyright  	2015 PrestaEdit
  * @version   	3.0
  * @link       	http://www.prestaedit.com/
  * @since      	File available since Release 1.0
@@ -188,6 +188,35 @@ class NavMegaDrownEvo extends Module
 
 			Tools::redirectAdmin('index.php?controller=AdminModules&configure='.$this->name.'&tab_module=&module_name='.$this->name.'&token='.Tools::getValue('token'));
 		}
+		else if (Tools::isSubmit('submitHelpNeeded'))
+		{
+			$datas = array(
+				'method' => 'help_needed',
+				'message' => Tools::getValue('HELP_MESSAGE'),
+				'email' => Tools::getValue('HELP_EMAIL')
+			);
+
+			if (Tools::getValue('HELP_SEND_INFORMATIONS'))
+			{
+				$datas['sending_informations'] = 1;
+				$datas['module_name'] = $this->displayName;
+				$datas['module_version'] = $this->version;
+				$datas['ps_version'] = _PS_VERSION_;
+			}
+			else
+				$datas['sending_informations'] = 0;
+
+			$curl = curl_init();
+
+			curl_setopt($curl, CURLOPT_URL, 'http://api.prestaedit.com');
+			curl_setopt($curl, CURLOPT_COOKIESESSION, true);
+			curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+			curl_setopt($curl, CURLOPT_POST, true);
+			curl_setopt($curl, CURLOPT_POSTFIELDS, $datas);
+
+			$return = curl_exec($curl);
+			curl_close($curl);
+		}
 		else
 			$output .= $this->displayForm();
 
@@ -359,6 +388,7 @@ class NavMegaDrownEvo extends Module
 						<ul class="nav nav-tabs">
 							<li '.($configure_active ? 'class="active"' : '').'><a href="#pane1" data-toggle="tab"><i class="icon-cogs"></i> '.$this->l('Settings').'</a></li>
 					    	<li '.($configure_active ? '' : 'class="active"').'><a href="#pane2" data-toggle="tab"><i class="icon-list-alt"></i> '.$this->l('Menu').'</a></li>
+					    	<li '.($configure_active ? '' : 'class="active"').'><a href="#panel_help" data-toggle="tab"><i class="icon-question"></i> '.$this->l('Help').'</a></li>
 						</ul>
 						<div class="tab-content">
 						    <div id="pane1" class="tab-pane '.($configure_active ? 'in active' : '').'">
@@ -367,6 +397,10 @@ class NavMegaDrownEvo extends Module
 
 						    <div id="pane2" class="tab-pane '.($configure_active ? '' : 'in active').'">
 						    	'.$this->renderTabPane().'
+						    </div>
+
+						    <div id="panel_help" class="tab-pane '.($configure_active ? '' : 'in active').'">
+						    	'.$this->renderAssistanceForm().'
 						    </div>
 						</div>
 					</div>';
@@ -709,10 +743,12 @@ class NavMegaDrownEvo extends Module
 							$this->_menu_tpl['li'][$b]['td1']['details'] = html_entity_decode($ValButton['detailSubLeft']);
 						}
 
-						for($c=1; $c<=$MaxCols; $c++)
+						$this->_menu_tpl['li'][$b]['td2'] = array();
+						for($c=1; $c <= $MaxCols; $c++)
 						{
+							$this->_menu_tpl['li'][$b]['td2'][$c] = array();
 							$this->_menu .= '<td valign="top">'.$this->eol;
-							for($l=1; $l<=$MaxLines; $l++)
+							for($l=1; $l <= $MaxLines; $l++)
 							{
 								if(array_key_exists($c, $tabColumnDatas[$kButton]))
 								if(array_key_exists($l, $tabColumnDatas[$kButton][$c]))
@@ -855,7 +891,7 @@ class NavMegaDrownEvo extends Module
 
 
 		$this->context->smarty->assign('menu', $this->_menu_tpl);
-		ppp($this->_menu_tpl);
+		//ppp($this->_menu_tpl);
 
 		return $this->display(__FILE__, 'views/templates/front/navmegadrownevo_wip.tpl');
 	}
@@ -889,4 +925,77 @@ class NavMegaDrownEvo extends Module
 		Tools::restoreCacheSettings();
 		return $html;
   	}
+
+  	private function renderAssistanceForm()
+	{
+		$fields_form = array(
+			'form' => array(
+				'legend' => array(
+					'title' => $this->l('Help'),
+					'icon' => 'icon-question'
+				),
+				'description' => $this->l('Do you need help ? Fill the form and submit your ask to us !'),
+				'input' => array(
+					array(
+		                'type' => 'text',
+		                'label' => $this->l('Email'),
+		                'name' => 'HELP_EMAIL',
+		                'size' => 20,
+		                'required' => true
+            		),
+            		array(
+		                'type' => 'textarea',
+		                'label' => $this->l('Message'),
+		                'name' => 'HELP_MESSAGE',
+		                'required' => true
+            		),
+            		array(
+						'type' => 'switch',
+						'label' => $this->l('Send informations:'),
+						'name' => 'HELP_SEND_INFORMATIONS',
+						'required' => true,
+						'is_bool' => true,
+						'values' => array(
+							array(
+								'id' => 'HELP_SEND_INFORMATIONS',
+								'value' => 1,
+								'label' => $this->l('Enabled')
+							),
+							array(
+								'id' => 'HELP_SEND_INFORMATIONS',
+								'value' => 0,
+								'label' => $this->l('Disabled')
+							)
+						)
+					),
+				),
+				'desc' => '<b>'.$this->l('Will be send').'</b>: <br /><ul><li>'.$this->l('Module name').'</li><li>'.$this->l('Module version').'</li><li>'.$this->l('PrestaShop version').'</li></ul>',
+				'submit' => array(
+					'title' => $this->l('Submit')
+				),
+			)
+		);
+
+		$helper = new HelperForm();
+		$helper->show_toolbar = false;
+		$helper->table =  $this->table;
+		$lang = new Language((int)Configuration::get('PS_LANG_DEFAULT'));
+		$helper->default_form_language = $lang->id;
+		$helper->allow_employee_form_lang = Configuration::get('PS_BO_ALLOW_EMPLOYEE_FORM_LANG') ? Configuration::get('PS_BO_ALLOW_EMPLOYEE_FORM_LANG') : 0;
+		$helper->identifier = $this->identifier;
+		$helper->submit_action = 'submitHelpNeeded';
+		$helper->currentIndex = $this->context->link->getAdminLink('AdminModules', false).'&configure='.$this->name.'&tab_module='.$this->tab.'&module_name='.$this->name;
+		$helper->token = Tools::getAdminTokenLite('AdminModules');
+		$helper->tpl_vars = array(
+			'fields_value' => array(
+				'HELP_EMAIL' => $this->context->employee->email,
+				'HELP_MESSAGE' => '',
+				'HELP_SEND_INFORMATIONS' => false,
+			),
+			'languages' => $this->context->controller->getLanguages(),
+			'id_language' => $this->context->language->id
+		);
+
+		return $helper->generateForm(array($fields_form));
+	}
 }

@@ -115,4 +115,4 @@
 	(MenuWidth, MenuHeight, MinButtonWidth, MaxButtonWidth, GeneralColor,
 	FontSizeMenu, FontSizeSubMenu, FontSizeSubSubMenu,
 	ColorFontMenu, ColorFontSubMenu, ColorFontSubSubMenu, VerticalPadding)
-	VALUES (980, 35, 98, 0, "#383838", 11, 11, 10, "#ffffff", "#ffffff", "#ffffff", 5);';
+	VALUES (980, 35, 98, 0, "#f6f6f6", 11, 11, 10, "#ffffff", "#ffffff", "#ffffff", 5);';
