@@ -111,7 +111,7 @@ class NavMegaDrownEvo extends Module
 			else
 				$output .= $this->displayConfirmation($this->l('Button added'));
 
-			Tools::redirectAdmin('index.php?controller=AdminModules&configure='.$this->name.'&tab_module=&module_name='.$this->name.'&token='.Tools::getValue('token'));
+			Tools::redirectAdmin('index.php?controller=AdminModules&configure='.$this->name.'&tab_module=&tab_active=menu&module_name='.$this->name.'&token='.Tools::getValue('token'));
 		}
 		else if (Tools::isSubmit('submitUpdateButton'))
 		{
@@ -126,7 +126,7 @@ class NavMegaDrownEvo extends Module
 			else
 				$output .= $this->displayConfirmation($this->l('Button updated'));
 
-			Tools::redirectAdmin('index.php?controller=AdminModules&configure='.$this->name.'&tab_module=&module_name='.$this->name.'&token='.Tools::getValue('token'));
+			Tools::redirectAdmin('index.php?controller=AdminModules&configure='.$this->name.'&tab_module=&tab_active=menu&module_name='.$this->name.'&token='.Tools::getValue('token'));
 		}
 		else if(Tools::isSubmit('submitConfigure'))
 		{
@@ -185,7 +185,7 @@ class NavMegaDrownEvo extends Module
 			Db::getInstance()->delete('admevo_custom_menu', 'id_button = '.(int)$id_button);
 			Db::getInstance()->delete('admevo_custom_menu_lang', 'id_button = '.(int)$id_button);
 
-			Tools::redirectAdmin('index.php?controller=AdminModules&configure='.$this->name.'&tab_module=&module_name='.$this->name.'&token='.Tools::getValue('token'));
+			Tools::redirectAdmin('index.php?controller=AdminModules&configure='.$this->name.'&tab_module=&tab_active=menu&module_name='.$this->name.'&token='.Tools::getValue('token'));
 		}
 		else if (Tools::isSubmit('submitHelpNeeded'))
 		{
@@ -216,7 +216,7 @@ class NavMegaDrownEvo extends Module
 			$return = curl_exec($curl);
 			curl_close($curl);
 
-			$output .= $this->displayForm();
+			Tools::redirectAdmin('index.php?controller=AdminModules&configure='.$this->name.'&tab_active=help&module_name='.$this->name.'&token='.Tools::getValue('token'));
 		}
 		else
 			$output .= $this->displayForm();
@@ -380,27 +380,24 @@ class NavMegaDrownEvo extends Module
 
 		$helper->fields_value = $this->getFieldsValue();
 
-		if (Tools::getValue('tab_active') == 'configure')
-			$configure_active = true;
-		else
-			$configure_active = false;
+		$tab_active = Tools::getValue('tab_active', 'menu');
 
 		$output .= '<div class="tabbable">
 						<ul class="nav nav-tabs">
-							<li '.($configure_active ? 'class="active"' : '').'><a href="#pane1" data-toggle="tab"><i class="icon-cogs"></i> '.$this->l('Settings').'</a></li>
-					    	<li '.($configure_active ? '' : 'class="active"').'><a href="#pane2" data-toggle="tab"><i class="icon-list-alt"></i> '.$this->l('Menu').'</a></li>
-					    	<li '.($configure_active ? '' : 'class="active"').'><a href="#panel_help" data-toggle="tab"><i class="icon-question"></i> '.$this->l('Help').'</a></li>
+							<li '.($tab_active == 'configure' ? 'class="active"' : '').'><a href="#pane1" data-toggle="tab"><i class="icon-cogs"></i> '.$this->l('Settings').'</a></li>
+					    	<li '.($tab_active == 'menu' ? 'class="active"' : '').'><a href="#pane2" data-toggle="tab"><i class="icon-list-alt"></i> '.$this->l('Menu').'</a></li>
+					    	<li '.($tab_active == 'help' ? 'class="active"' : '').'><a href="#panel_help" data-toggle="tab"><i class="icon-question"></i> '.$this->l('Help').'</a></li>
 						</ul>
 						<div class="tab-content">
-						    <div id="pane1" class="tab-pane '.($configure_active ? 'in active' : '').'">
+						    <div id="pane1" class="tab-pane '.($tab_active == 'configure' ? 'in active' : '').'">
 						    	'.$helper->generateForm($this->fields_form).'
 						    </div>
 
-						    <div id="pane2" class="tab-pane '.($configure_active ? '' : 'in active').'">
+						    <div id="pane2" class="tab-pane '.($tab_active == 'menu' ? 'in active' : '').'">
 						    	'.$this->renderTabPane().'
 						    </div>
 
-						    <div id="panel_help" class="tab-pane '.($configure_active ? '' : 'in active').'">
+						    <div id="panel_help" class="tab-pane '.($tab_active == 'help' ? 'in active' : '').'">
 						    	'.$this->renderAssistanceForm().'
 						    </div>
 						</div>
