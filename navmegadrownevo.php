@@ -48,7 +48,7 @@ class NavMegaDrownEvo extends Module
 		$this->displayName = $this->l('MeGa DrOwN mEnU Evolution');
 		$this->description = $this->l('Add a MeGa DrOwN mEnU Evolution.');
 		$this->confirmUninstall = $this->l('Are you sure you want to delete this module ?');
-		$this->allow = intval(Configuration::get('PS_REWRITING_SETTINGS'));
+		$this->allow = (int)Configuration::get('PS_REWRITING_SETTINGS');
 	}
 
 	public function install()
@@ -87,9 +87,8 @@ class NavMegaDrownEvo extends Module
 		$warning = $this->displayName.$this->l(' is in test for PrestaShop 1.6. If you need, contact me at: ').' j.danse@prestaedit.com';
 		$this->adminDisplayWarning($warning);
 
-		$defaultLanguage = intval(Configuration::get('PS_LANG_DEFAULT'));
 		$languages = Language::getLanguages();
-		$iso = Language::getIsoById($defaultLanguage);
+		$iso = Language::getIsoById((int)Configuration::get('PS_LANG_DEFAULT'));
 		$output = "";
 		$errors = array();
 		$errorsNb = 0;
@@ -104,7 +103,7 @@ class NavMegaDrownEvo extends Module
 			$button->order_button = (int)$order_button;
 			$button = $this->processSubmitButton($button);
 
-			if(!$button->add())
+			if (!$button->add())
 				$errorsNb++;
 
 			if ($errorsNb)
@@ -119,7 +118,7 @@ class NavMegaDrownEvo extends Module
 			$button = new Button((int)Tools::getValue('id_button'));
 			$button = $this->processSubmitButton($button);
 
-			if(!$button->update())
+			if (!$button->update())
 				$errorsNb++;
 
 			if ($errorsNb)
@@ -166,7 +165,7 @@ class NavMegaDrownEvo extends Module
 			$result = Db::getInstance()->autoExecuteWithNullValues(
 				_DB_PREFIX_.'admevo_parameters',
 				$tabDesign,
-				"UPDATE"
+				'UPDATE'
 			);
 
 			$output .= $this->displayConfirmation($this->l('Settings saved'));
@@ -175,7 +174,7 @@ class NavMegaDrownEvo extends Module
 
 			Tools::redirectAdmin('index.php?controller=AdminModules&configure='.$this->name.'&tab_active=configure&module_name='.$this->name.'&token='.Tools::getValue('token'));
 		}
-		else if(Tools::getIsset('deletenavmegadrownevo'))
+		else if (Tools::getIsset('deletenavmegadrownevo'))
 		{
 			$id_button = (int)Tools::getValue('id_button');
 
@@ -216,6 +215,8 @@ class NavMegaDrownEvo extends Module
 
 			$return = curl_exec($curl);
 			curl_close($curl);
+
+			$output .= $this->displayForm();
 		}
 		else
 			$output .= $this->displayForm();
@@ -379,7 +380,7 @@ class NavMegaDrownEvo extends Module
 
 		$helper->fields_value = $this->getFieldsValue();
 
-		if(Tools::getValue('tab_active') == 'configure')
+		if (Tools::getValue('tab_active') == 'configure')
 			$configure_active = true;
 		else
 			$configure_active = false;
@@ -504,10 +505,10 @@ class NavMegaDrownEvo extends Module
 		// Link
 		$fields_form[0]['form']['input'][] = Fields::addField($this->l('Link'), 'link', null, '', true);
 
-		if($type == 'update')
+		if ($type == 'update')
 			$fields_form[0]['form']['input'][] = Fields::addHiddenField('id_button');
 
-		if($type == 'add')
+		if ($type == 'add')
 		{
 			$helper->fields_value['button_color'] = '';
 			$helper->fields_value['use_color'] = false;
@@ -520,14 +521,14 @@ class NavMegaDrownEvo extends Module
 				$helper->fields_value['link'][$language['id_lang']] = '';
 			}
 		}
-		else if($type == 'update')
+		else if ($type == 'update')
 		{
 			$button = new Button((int)Tools::getValue('id_button'));
 
 			$helper->fields_value['id_button'] = (int)Tools::getValue('id_button');
 
 			$helper->fields_value['button_color'] = $button->buttonColor;
-			if($button->buttonColor != '')
+			if ($button->buttonColor != '')
 				$helper->fields_value['use_color'] = true;
 			else
 				$helper->fields_value['use_color'] = false;
@@ -568,7 +569,7 @@ class NavMegaDrownEvo extends Module
 		$fields_value = array();
 
 		$MDParameters = MegaDrownEvo::getParameters();
-		foreach($MDParameters as $param => $value)
+		foreach ($MDParameters as $param => $value)
 			$fields_value[$param] = $value;
 
 		$fields_value['PictureMenu'] = '';
@@ -605,7 +606,7 @@ class NavMegaDrownEvo extends Module
 				$active_category = (int)$this->context->cookie->last_visited_category;
 		}
 
-		if($active_category !== null)
+		if ($active_category !== null)
 			$resultCat = Db::getInstance()->ExecuteS('SELECT * FROM '._DB_PREFIX_.'admevo_button_link_cat WHERE id_link_cat='.(int)$active_category);
 		/* END: ACTIVE CATEGORY */
 
@@ -614,9 +615,9 @@ class NavMegaDrownEvo extends Module
 		$this->_menu_tpl['search_bar'] = (int)$MDParameters['SearchBar'];
 
 		$MDConfiguration = MegaDrownEvo::getConfigurations((int)$this->context->language->id);
-		if(sizeof($MDConfiguration))
+		if (count($MDConfiguration))
 		{
-			foreach($MDConfiguration as $kButton => $ValButton)
+			foreach ($MDConfiguration as $kButton => $ValButton)
 			{
 				$id_button = (int)$ValButton['id_button'];
 
@@ -625,9 +626,9 @@ class NavMegaDrownEvo extends Module
 
 				$CatMenu 	= array();
 				$CatMenu 	= MegaDrownEvo::getButtonLinksCat($id_button);
-				if(sizeof($CatMenu))
+				if (count($CatMenu))
 				{
-					foreach($CatMenu as $kMenu=>$ValCat)
+					foreach ($CatMenu as $kMenu => $ValCat)
 					{
 						$tabIdLinkCat[$id_button][$ValCat['id_link_cat']] = $ValCat['id_link_cat'];
 						$DescendantCateogries = Db::getInstance()->ExecuteS('
@@ -635,33 +636,33 @@ class NavMegaDrownEvo extends Module
 							FROM '._DB_PREFIX_.'category
 							WHERE id_parent='.$ValCat['id_link_cat']);
 
-						if(sizeof($DescendantCateogries))
-							foreach($DescendantCateogries as $kDescCat=>$ValDescCat)
+						if (count($DescendantCateogries))
+							foreach ($DescendantCateogries as $kDescCat => $ValDescCat)
 								$tabIdLinkCat[$ValButton['id_button']][$ValDescCat['id_category']] = $ValDescCat['id_category'];
 					}
 				}
 
 				$CustomMenu = array();
-				$CustomMenu = MegaDrownEvo::getButtonLinksCustom($id_button, $this->context->language->id);
-				if(sizeof($CustomMenu))
+				$CustomMenu = MegaDrownEvo::getButtonLinksCustom($id_button, (int)$this->context->language->id);
+				if (count($CustomMenu))
 				{
-					foreach($CustomMenu as $kMenu=>$ValMenu)
+					foreach ($CustomMenu as $kMenu=>$ValMenu)
 					{
 						$tabLinkCustom[$id_button][$ValMenu['id_custom']] = basename($ValMenu['link']);
 						$CustomMenuUnder = array();
-						$CustomMenuUnder = MegaDrownEvo::getButtonLinksCustomUnder($id_button, $ValMenu['id_custom'], $this->context->language->id);
-						if(sizeof($CustomMenuUnder))
-							foreach($CustomMenuUnder as $kDescCustom=>$ValDescCustom)
+						$CustomMenuUnder = MegaDrownEvo::getButtonLinksCustomUnder($id_button, $ValMenu['id_custom'], (int)$this->context->language->id);
+						if (count($CustomMenuUnder))
+							foreach ($CustomMenuUnder as $kDescCustom => $ValDescCustom)
 								$tabLinkCustom[$id_button][$ValDescCustom['id_custom']] = basename($ValDescCustom['link']);
 					}
 				}
 			}
 		}
 
-		if (sizeof($MDConfiguration))
+		if (count($MDConfiguration))
 		{
 			$b = 0;
-			foreach($MDConfiguration as $kButton => $ValButton)
+			foreach ($MDConfiguration as $kButton => $ValButton)
 			{
 				$this->_menu_tpl['li'][$b] = array();
 
@@ -672,7 +673,7 @@ class NavMegaDrownEvo extends Module
 
 				strpos(strtolower($this->_menu_tpl['li'][$b]['name']), "<br />") ? $this->_menu_tpl['li'][$b]['decal'] = "margin-top : -5px;" : $this->_menu_tpl['li'][$b]['decal'] = "";
 
-				if($ValButton['link'] != '')
+				if ($ValButton['link'] != '')
 					$this->_menu_tpl['li'][$b]['link_button'] = $ValButton['link'];
 				else
 					$this->_menu_tpl['li'][$b]['link_button'] = "#";
@@ -684,14 +685,14 @@ class NavMegaDrownEvo extends Module
 						$this->_css .= '.liBouton'.$b.' { background-color: '.$ValButton['buttonColor'].' }'.$this->eol;
 
 				$CatMenu 	= MegaDrownEvo::getButtonLinksCat((int)$id_button);
-				$CustomMenu = MegaDrownEvo::getButtonLinksCustom((int)$id_button, $this->context->language->id);
+				$CustomMenu = MegaDrownEvo::getButtonLinksCustom((int)$id_button, (int)$this->context->language->id);
 				$NbColsMax 	= MegaDrownEvo::getMaxColumns((int)$id_button);;
 				$MaxCols	= 0;
 				$MaxLines	= 0;
 				$tabLines	= array();
 				$m=0;
 
-				if(sizeof($CatMenu))
+				if (count($CatMenu))
 				{
 					foreach($CatMenu as $kMenu => $ValCat)
 					{
@@ -704,7 +705,7 @@ class NavMegaDrownEvo extends Module
 					}
 				}
 
-				if(sizeof($CustomMenu))
+				if (count($CustomMenu))
 				{
 					foreach($CustomMenu as $kCustom => $ValCustom)
 					{
@@ -717,24 +718,24 @@ class NavMegaDrownEvo extends Module
 					}
 				}
 
-				if(array_key_exists($kButton, $tabLines))
+				if (array_key_exists($kButton, $tabLines))
 				{
-					if(sizeof($tabLines[$kButton]))
+					if (count($tabLines[$kButton]))
 					{
 						$this->_menu_tpl['li'][$b]['sub'] = 1;
 						$this->_menu_tpl['li'][$b]['sub']['bg_color'] = $ValButton['buttonColor'];
 
-						if($MDParameters['stateTR1'])
+						if ($MDParameters['stateTR1'])
 						{
 							$this->_menu_tpl['li'][$b]['tr1'] = 1;
 							$this->_menu_tpl['li'][$b]['tr1']['details']['sub_tr'] = html_entity_decode($ValButton['detailSubTR']);
 							$this->_menu_tpl['li'][$b]['tr1']['details']['sub'] = html_entity_decode($ValButton['detailSub']);
 						}
 
-						if($MDParameters['stateTD1'])
+						if ($MDParameters['stateTD1'])
 						{
 							$this->_menu_tpl['li'][$b]['td1'] = 1;
-							if($ValButton['img_name'] != '')
+							if ($ValButton['img_name'] != '')
 							{
 								$this->_menu_tpl['li'][$b]['td1']['img'] = 1;
 								$this->_menu_tpl['li'][$b]['td1']['img']['link'] = urldecode($ValButton['img_link']);
@@ -744,104 +745,107 @@ class NavMegaDrownEvo extends Module
 						}
 
 						$this->_menu_tpl['li'][$b]['td2'] = array();
-						for($c=1; $c <= $MaxCols; $c++)
+						for ($c=1; $c <= $MaxCols; $c++)
 						{
 							$this->_menu_tpl['li'][$b]['td2'][$c] = array();
 							$this->_menu .= '<td valign="top">'.$this->eol;
-							for($l=1; $l <= $MaxLines; $l++)
+							for ($l=1; $l <= $MaxLines; $l++)
 							{
-								if(array_key_exists($c, $tabColumnDatas[$kButton]))
-								if(array_key_exists($l, $tabColumnDatas[$kButton][$c]))
-								if(sizeof(@$tabColumnDatas[$kButton][$c][$l]))
-								{
-									$this->_menu .= '<table border="0" style="width:'.$MDParameters['columnSize'].'px">'.$this->eol;
-									foreach($tabColumnDatas[$kButton][$c][$l] as $keyMenu=>$ValMenu)
-									{
-										$this->_menu .= '<tr>'.$this->eol;
-										$this->_menu .= '<td style="width:'.$MDParameters['columnSize'].'px">'.$this->eol;
-										switch($tabColumnType[$kButton][$c][$l][$keyMenu])
+								if (array_key_exists($c, $tabColumnDatas[$kButton]))
+									if (array_key_exists($l, $tabColumnDatas[$kButton][$c]))
+										if (count(@$tabColumnDatas[$kButton][$c][$l]))
 										{
-											case 'category':
-												$category = new Category((int)$ValMenu['id_link_cat']);
-
-												if(!$category->checkAccess($this->context->customer->id))
-													break;
-												else
+											$this->_menu .= '<table border="0" style="width:'.$MDParameters['columnSize'].'px">'.$this->eol;
+											foreach ($tabColumnDatas[$kButton][$c][$l] as $keyMenu=>$ValMenu)
+											{
+												$this->_menu .= '<tr>'.$this->eol;
+												$this->_menu .= '<td style="width:'.$MDParameters['columnSize'].'px">'.$this->eol;
+												switch ($tabColumnType[$kButton][$c][$l][$keyMenu])
 												{
-													$this->_menu .= '<ul>'.$this->eol;
-													$NameCategory = $this->getNameCategory($ValMenu['id_link_cat'], $this->context->language->id, $ValButton['id_button']);
-													$NameSubstitute = $this->getNameSubstitute($ValMenu['id_link_cat'], $this->context->language->id, $ValButton['id_button']);
-													$Category = new Category(intval($ValMenu['id_link_cat']), intval($this->context->language->id));
-													$rewrited_url = $this->context->link->getCategoryLink($ValMenu['id_link_cat']);
-													$this->_menu .= '	<li class="stitle">
-																			<a href="'.$rewrited_url.'" style="text-align:left">'.(trim($NameSubstitute[0]['name_substitute']) != '' ? $NameSubstitute[0]['name_substitute'] : $NameCategory[0]['name']).'</a>
-																		</li>'.$this->eol;
+													case 'category':
+														$category = new Category((int)$ValMenu['id_link_cat']);
 
-													if($ValMenu['view_products'] != 'on')
-													{
-														$NameCategoryUnder = array();
-														$NameCategoryUnder = $this->getNameCategoryUnder($ValMenu['id_link_cat'], $ValButton['id_button']);
-														if(sizeof($NameCategoryUnder))
+														if (!$category->checkAccess((int)$this->context->customer->id))
+															break;
+														else
 														{
-															foreach($NameCategoryUnder as $KUnderCat=>$ValUnderCat)
+															$this->_menu .= '<ul>'.$this->eol;
+															$NameCategory = $this->getNameCategory($ValMenu['id_link_cat'], (int)$this->context->language->id, $ValButton['id_button']);
+															$NameSubstitute = $this->getNameSubstitute($ValMenu['id_link_cat'], (int)$this->context->language->id, $ValButton['id_button']);
+															$Category = new Category((int)$ValMenu['id_link_cat'], (int)$this->context->language->id);
+															$rewrited_url = $this->context->link->getCategoryLink($ValMenu['id_link_cat']);
+															$this->_menu .= '	<li class="stitle">
+																					<a href="'.$rewrited_url.'" style="text-align:left">'.(trim($NameSubstitute[0]['name_substitute']) != '' ? $NameSubstitute[0]['name_substitute'] : $NameCategory[0]['name']).'</a>
+																				</li>'.$this->eol;
+
+															if($ValMenu['view_products'] != 'on')
 															{
-																$Category = new Category(intval($ValUnderCat['id_category']), intval($this->context->language->id));
-																if($Category->checkAccess($context->customer->id))
+																$NameCategoryUnder = array();
+																$NameCategoryUnder = $this->getNameCategoryUnder($ValMenu['id_link_cat'], $ValButton['id_button']);
+																if (count($NameCategoryUnder))
 																{
-																	$rewrited_url = $this->context->link->getCategoryLink($ValUnderCat['id_category']);
-																	$NameCategoryUnder = $this->getNameCategory($ValUnderCat['id_category'], $this->context->language->id, $ValButton['id_button']);
-																	$NameSubstitute = $this->getNameSubstitute($ValUnderCat['id_category'], $this->context->language->id, $ValButton['id_button']);
-																	$this->_menu .= '	<li>
-																							<a href="'.$rewrited_url.'" style="text-align:left">'.(trim($NameSubstitute[0]['name_substitute']) != '' ? $NameSubstitute[0]['name_substitute'] : $NameCategoryUnder[0]['name']).'</a>
-																						</li>'.$this->eol;
+																	foreach ($NameCategoryUnder as $KUnderCat=>$ValUnderCat)
+																	{
+																		$Category = new Category(intval($ValUnderCat['id_category']), (int)$this->context->language->id);
+																		if ($Category->checkAccess($context->customer->id))
+																		{
+																			$rewrited_url = $this->context->link->getCategoryLink($ValUnderCat['id_category']);
+																			$NameCategoryUnder = $this->getNameCategory($ValUnderCat['id_category'], (int)$this->context->language->id, $ValButton['id_button']);
+																			$NameSubstitute = $this->getNameSubstitute($ValUnderCat['id_category'], (int)$this->context->language->id, $ValButton['id_button']);
+																			$this->_menu .= '	<li>
+																									<a href="'.$rewrited_url.'" style="text-align:left">'.(trim($NameSubstitute[0]['name_substitute']) != '' ? $NameSubstitute[0]['name_substitute'] : $NameCategoryUnder[0]['name']).'</a>
+																								</li>'.$this->eol;
+																		}
+																	}
 																}
 															}
-														}
-													}
-													else
-													{
-														$NameProductsUnder = array();
-														$NameProductsUnder = $this->getProductsUnder($ValMenu['id_link_cat'], $this->context->language->id, $this->context->shop->id);
-														if(sizeof($NameProductsUnder))
-														{
-															foreach($NameProductsUnder as $KUnderProd=>$ValUnderProd)
+															else
 															{
-																$Products = new Product(intval($ValUnderProd['id_product']), true, intval($this->context->language->id));
-																$rewrited_url = $Products->getLink();
-																$NameProduct = $Products->name;
-																$this->_menu .= '<li><a href="'.$rewrited_url.'" style="text-align:left">'.(strlen($NameProduct)>20 ? substr(($NameProduct), 0, 40)."..." : ($NameProduct)).'</a></li>'.$this->eol;
+																$NameProductsUnder = array();
+																$NameProductsUnder = $this->getProductsUnder($ValMenu['id_link_cat'], (int)$this->context->language->id, $this->context->shop->id);
+																if (count($NameProductsUnder))
+																{
+																	foreach ($NameProductsUnder as $KUnderProd=>$ValUnderProd)
+																	{
+																		$Products = new Product(intval($ValUnderProd['id_product']), true, (int)$this->context->language->id);
+																		$rewrited_url = $Products->getLink();
+																		$NameProduct = $Products->name;
+																		$this->_menu .= '<li><a href="'.$rewrited_url.'" style="text-align:left">'.(strlen($NameProduct)>20 ? substr(($NameProduct), 0, 40)."..." : ($NameProduct)).'</a></li>'.$this->eol;
+																	}
+																}
 															}
+															$this->_menu .= '</ul>'.$this->eol;
 														}
-													}
-													$this->_menu .= '</ul>'.$this->eol;
+
+														break;
+
+													case 'custom':
+														$this->_menu .= '<ul>'.$this->eol;
+														$this->_menu .= '<li class="stitle"><a href="'.$ValMenu['link'].'" '.($ValMenu['link']=="#" || $ValMenu['link']=="" ? "onclick='return false'" : false).' style="text-align:left">'.$ValMenu['name_menu'].'</a></li>'.$this->eol;
+														$NameLinkUnder = array();
+														$NameLinkUnder = $this->getButtonLinksCustomUnder($ValButton['id_button'], $ValMenu['id_custom'], (int)$this->context->language->id);
+														if (count($NameLinkUnder))
+														{
+															foreach ($NameLinkUnder as $KUnderLink => $ValUnderLink)
+																$this->_menu .= '<li><a href="'.$ValUnderLink['link'].'" '.($ValUnderLink['link']=="#" || $ValUnderLink['link']=="" ? "onclick='return false'" : false).' style="text-align:left">'.$ValUnderLink['name_menu'].'</a></li>'.$this->eol;
+														}
+														$this->_menu .= '</ul>'.$this->eol;
+													break;
 												}
 
-												break;
+												$this->_menu .= '</td>'.$this->eol;
+												$this->_menu .= '</tr>'.$this->eol;
+											}
 
-											case 'custom':
-												$this->_menu .= '<ul>'.$this->eol;
-												$this->_menu .= '<li class="stitle"><a href="'.$ValMenu['link'].'" '.($ValMenu['link']=="#" || $ValMenu['link']=="" ? "onclick='return false'" : false).' style="text-align:left">'.$ValMenu['name_menu'].'</a></li>'.$this->eol;
-												$NameLinkUnder = array();
-												$NameLinkUnder = $this->getButtonLinksCustomUnder($ValButton['id_button'], $ValMenu['id_custom'], $this->context->language->id);
-												if(sizeof($NameLinkUnder))
-												{
-													foreach($NameLinkUnder as $KUnderLink=>$ValUnderLink)
-														$this->_menu .= '<li><a href="'.$ValUnderLink['link'].'" '.($ValUnderLink['link']=="#" || $ValUnderLink['link']=="" ? "onclick='return false'" : false).' style="text-align:left">'.$ValUnderLink['name_menu'].'</a></li>'.$this->eol;
-												}
-												$this->_menu .= '</ul>'.$this->eol;
-											break;
+											$this->_menu .= '</table>'.$this->eol;
 										}
-										$this->_menu .= '</td>'.$this->eol;
-										$this->_menu .= '</tr>'.$this->eol;
-									}
-									$this->_menu .= '</table>'.$this->eol;
-								}
 							}
+
 							$this->_menu .= '</td>'.$this->eol;
 						}
 
 						//Colonne droite;
-						if($MDParameters['stateTD3'] && !$MDParameters['stateTR1'])
+						if ($MDParameters['stateTD3'] && !$MDParameters['stateTR1'])
 						{
 							$this->_menu_tpl['li'][$b]['td3'] = 1;
 							$this->_menu_tpl['li'][$b]['td3']['details'] = html_entity_decode($ValButton['detailSub']);
@@ -889,9 +893,7 @@ class NavMegaDrownEvo extends Module
 		$this->context->smarty->assign('menuMDEvo', $this->_menu);
 		$this->context->smarty->assign('search_bar', $this->_searchBar);
 
-
 		$this->context->smarty->assign('menu', $this->_menu_tpl);
-		//ppp($this->_menu_tpl);
 
 		return $this->display(__FILE__, 'views/templates/front/navmegadrownevo_wip.tpl');
 	}
@@ -979,8 +981,7 @@ class NavMegaDrownEvo extends Module
 		$helper = new HelperForm();
 		$helper->show_toolbar = false;
 		$helper->table =  $this->table;
-		$lang = new Language((int)Configuration::get('PS_LANG_DEFAULT'));
-		$helper->default_form_language = $lang->id;
+		$helper->default_form_language = (int)Configuration::get('PS_LANG_DEFAULT');
 		$helper->allow_employee_form_lang = Configuration::get('PS_BO_ALLOW_EMPLOYEE_FORM_LANG') ? Configuration::get('PS_BO_ALLOW_EMPLOYEE_FORM_LANG') : 0;
 		$helper->identifier = $this->identifier;
 		$helper->submit_action = 'submitHelpNeeded';
@@ -993,7 +994,7 @@ class NavMegaDrownEvo extends Module
 				'HELP_SEND_INFORMATIONS' => false,
 			),
 			'languages' => $this->context->controller->getLanguages(),
-			'id_language' => $this->context->language->id
+			'id_language' => (int)$this->context->language->id
 		);
 
 		return $helper->generateForm(array($fields_form));
