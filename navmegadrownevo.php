@@ -507,11 +507,11 @@ class NavMegaDrownEvo extends Module
 			$helper->fields_value['use_color'] = false;
 			foreach ($languages as $language)
 			{
-				$helper->fields_value['button_name'][$language['id_lang']] = '';
-				$helper->fields_value['sub_left'][$language['id_lang']] = '';
-				$helper->fields_value['sub_tr'][$language['id_lang']] = '';
-				$helper->fields_value['sub'][$language['id_lang']] = '';
-				$helper->fields_value['link'][$language['id_lang']] = '';
+				$helper->fields_value['button_name'][(int)$language['id_lang']] = '';
+				$helper->fields_value['sub_left'][(int)$language['id_lang']] = '';
+				$helper->fields_value['sub_tr'][(int)$language['id_lang']] = '';
+				$helper->fields_value['sub'][(int)$language['id_lang']] = '';
+				$helper->fields_value['link'][(int)$language['id_lang']] = '';
 			}
 		}
 		else if ($type == 'update')
