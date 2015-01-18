@@ -451,13 +451,9 @@ class NavMegaDrownEvo extends Module
 		$helper->token = Tools::getAdminTokenLite('AdminModules');
 		$helper->currentIndex = AdminController::$currentIndex.'&configure='.$this->name;
 		$buttons = MegaDrownEvo::getConfigurations((int)$this->context->language->id);
-		if (is_array($buttons) && count($buttons))
-		{
-			$helper->listTotal = count($buttons);
-			return $helper->generateList($buttons, $fields_list);
-		}
-		else
-			return false;
+		$helper->listTotal = count($buttons);
+
+		return $helper->generateList($buttons, $fields_list);
 	}
 
 	private function initForm($type)
